@@ -6,4 +6,5 @@ build/
 __pycache__/
 PDFTexts/
 UserVoiceMessages/
+Conversation/
 QuickGPT.spec
