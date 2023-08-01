@@ -1,3 +1,0 @@
-document_pdf_path=C:/Users/haithem-yk/Desktop/Coding Books/AlgorithmsNotesForProfessionals.pdf
-document_name=AlgorithmsNotesForProfessionals
-document_number_pages=257

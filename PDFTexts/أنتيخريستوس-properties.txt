@@ -1,3 +1,0 @@
-document_pdf_path=C:/Users/haithem-yk/Desktop/أنتيخريستوس.pdf
-document_name=أنتيخريستوس
-document_number_pages=312

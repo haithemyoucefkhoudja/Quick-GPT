@@ -1,2 +1,0 @@
-pyinstaller --noconsole --icon=quick-gpt-logo.ico --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ex .\QuickGPT.py
-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

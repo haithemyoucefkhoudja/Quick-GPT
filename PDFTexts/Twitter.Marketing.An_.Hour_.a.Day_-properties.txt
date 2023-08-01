@@ -1,3 +1,0 @@
-document_pdf_path=C:/Users/haithem-yk/Desktop/Marketing Books/Twitter.Marketing.An_.Hour_.a.Day_.pdf
-document_name=Twitter.Marketing.An_.Hour_.a.Day_
-document_number_pages=507
