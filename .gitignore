@@ -3,4 +3,7 @@ venv/
 2023*/
 dist/
 build/
+__pycache__/
+PDFTexts/
+UserVoiceMessages/
 QuickGPT.spec
