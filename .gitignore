@@ -1,0 +1,6 @@
+.idea/
+venv/
+2023*/
+dist/
+build/
+QuickGPT.spec
