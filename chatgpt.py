@@ -146,7 +146,6 @@ class Bot(QThread):
                                 function_response = fuction_to_call(
                                     first_page=first_page,
                                     last_page=last_page,
-                                    user_tokens=user_input_tokens
                                 )
                                 index = len(self.conversation) - 1
                                 list = [{
