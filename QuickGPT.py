@@ -6,7 +6,6 @@ import sys
 import time
 import wave
 import webbrowser
-
 import pyaudio as pa
 import keyboard
 from PyQt6 import QtWidgets
@@ -30,7 +29,7 @@ font = "Tahoma"
 basedir = os.getcwd()
 bot = Bot()
 
-directories = ['Conversation', 'UserVoiceMessages', 'PDFTexts']
+directories = ['Conversation', 'UserVoiceMessages', 'Docs']
 # Create the directories if they don't exist
 for directory in directories:
     if not os.path.exists(directory):
@@ -57,6 +56,11 @@ def raise_error_message(message):
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
+        """
+        Initializes the SettingsDialog object.
+            Args:
+                parent: The parent widget (default: None).
+        """
         super().__init__(parent)
         self.setFixedSize(250, 450)
         self.setWindowTitle("Settings")
@@ -180,6 +184,9 @@ QComboBox QAbstractItemView::item:selected {
         self.setLayout(layout)
 
     def save_parameters(self):
+        """
+                Saves the selected settings and updates the bot's parameters.
+                """
         bot.model = self.models_combobox.currentText()
         bot.api_key = self.apikey_edit.text()
         bot.organization_key = self.organizationkey_edit.text()
@@ -589,43 +596,6 @@ class BotThread(QThread):
 class Messanger(QWidget):
     global basedir
     lineLength = 60
-    language_extensions = {
-        "python": ".py",
-        "java": ".java",
-        "c": ".c",
-        "c++": ".cpp",
-        "c#": ".cs",
-        "javascript": ".js",
-        "ruby": ".rb",
-        "go": ".go",
-        "swift": ".swift",
-        "rust": ".rs",
-        "php": ".php",
-        "html": ".html",
-        "css": ".css",
-        "shell script": ".sh",
-        "sql": ".sql",
-        "kotlin": ".kt",
-        "typescript": ".ts",
-        "perl": ".pl",
-        "scala": ".scala",
-        "objective-c": ".m",
-        "matlab": ".m",
-        "haskell": ".hs",
-        # Add more languages and extensions as needed
-    }
-    Conversation = os.path.join(basedir, "Conversation")
-
-    # Get the current date and time
-    current_datetime = datetime.datetime.now()
-    # Extract the date and time components
-    current_date = current_datetime.date()
-    current_time = current_datetime.time()
-    # Format the time without microseconds
-    formatted_time = current_time.strftime("%H-%M-%S")
-    messages_dir = f"{current_date}---{formatted_time}"
-    conversation_base_dir = os.path.join(Conversation, messages_dir)
-    os.makedirs(conversation_base_dir)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -709,6 +679,7 @@ class Messanger(QWidget):
             self.animation_thread.resume()
             # Start animation after adding the user label
             self.user_text = self.add_label(message)
+
     def stop_bot(self):
         bot.stop = True
 
@@ -797,9 +768,6 @@ class IconsMenu(QWidget):
         self.comboBox.setFont(QFont(font, 10))
         self.setFixedWidth(510)
         self.populate_combo_box()
-        if not len(bot.document_list) == 0:
-            bot.curr_document = bot.document_list[self.index]
-        self.comboBox.currentIndexChanged.connect(self.on_document_selected)
         self.add_new_pdf_button = CustomButton(icon_path="icons/plus-button.png")
         self.add_new_pdf_button.clicked.connect(self.open_navigation_bar)
         self.add_new_pdf_button.setStatusTip("Upload PDF File")
@@ -837,9 +805,8 @@ class IconsMenu(QWidget):
             selected_files = file_dialog.selectedFiles()
             for file in selected_files:
                 pdf_name = os.path.basename(file.split("/")[-1].split(".pdf")[0])
-                bot.add_document(pdf_name, file)
+                bot.pdf_embedding(file, pdf_name)
                 self.comboBox.addItem(pdf_name)
-        pass
 
     def populate_combo_box(self):
         self.comboBox.setStyleSheet("""
@@ -886,21 +853,14 @@ QComboBox QAbstractItemView::item:selected {
 }
         """)
         # Directory path where the files are located
-        directory_path = os.path.join(basedir, "PDFTexts")
+        directory_path = os.path.join(basedir, "Docs")
         # Get a list of files ending with "-properties"
-        file_names = [file for file in os.listdir(directory_path) if file.endswith("-properties.txt")]
+        file_names = [file for file in os.listdir(directory_path) if file.endswith("_indicator")]
 
         # Iterate over the files and add the PDF Files
         for file_name in file_names:
             document_name = file_name.split("-properties.txt")[0]
             self.comboBox.addItem(document_name)
-            file_path = os.path.join(directory_path, file_name)
-            bot.add_document(document_name)
-
-
-    def on_document_selected(self, index):
-        self.index = index
-        bot.curr_document = bot.document_list[self.index]
 
 
 class MainWindow(QMainWindow):

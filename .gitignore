@@ -4,7 +4,9 @@ venv/
 dist/
 build/
 __pycache__/
-PDFTexts/
+Docs/
 UserVoiceMessages/
 Conversation/
+db/
 QuickGPT.spec
+OPENAI
