@@ -734,25 +734,6 @@ class Messanger(QWidget):
             self.scrollArea.verticalScrollBar().maximum()
         )
 
-"""
-def donate_message_box():
-    # Replace 'YOUR_WALLET_ADDRESS' with your actual wallet address
-    wallet_address = 'YOUR_WALLET_ADDRESS'
-
-    # The message to display in the QMessageBox
-    message = f"Thank you for considering donating!\n\nPlease send your donation to the following wallet address:\n\n{wallet_address}"
-
-    # Create the QMessageBox and set its properties
-    msg_box = QMessageBox()
-    msg_box.setIcon(QMessageBox.Icon.Information)
-    msg_box.setWindowTitle("Donate")
-    msg_box.setText(message)
-
-    # Add a 'Close' button to the message box
-    msg_box.addButton(QMessageBox.StandardButton.Close)
-    msg_box.exec()
-"""
-
 
 class IconsMenu(QWidget):
     def __init__(self):
@@ -774,25 +755,18 @@ class IconsMenu(QWidget):
         self.add_new_pdf_button.setFixedWidth(42)
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        open_link_button = CustomButton()
-        open_link_button.set_custom_Style("rgb(80, 80, 80)", "rgb(255, 8, 76)", "icons/heart.png")
-
-        open_link_button.clicked.connect(lambda: webbrowser.open('https://donorbox.org/donate-quick-gpt'))
-
         telegram_link_button = CustomButton()
         telegram_link_button.set_custom_Style(hover_color="rgb(100,190,249)", color="rgb(80, 80, 80)",icon="icons/share.png")
         telegram_link_button.clicked.connect(lambda: webbrowser.open("https://t.me/+XKFgOwVjUVs4NDBk"))
-        open_link_button.setFixedWidth(42)
         telegram_link_button.setFixedWidth(42)
+
         self.layout.addWidget(label)
         self.layout.addWidget(self.comboBox)
         self.layout.addWidget(self.add_new_pdf_button)
         self.layout.addStretch()
         self.layout.addWidget(telegram_link_button)
-        self.layout.addWidget(open_link_button)
 
         self.layout.setAlignment(telegram_link_button, Qt.AlignmentFlag.AlignRight)
-        self.layout.setAlignment(open_link_button, Qt.AlignmentFlag.AlignRight)
         self.layout.setAlignment(self.comboBox, Qt.AlignmentFlag.AlignLeft)
         self.layout.setAlignment(self.add_new_pdf_button, Qt.AlignmentFlag.AlignLeft)
         self.setLayout(self.layout)
