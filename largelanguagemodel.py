@@ -146,7 +146,8 @@ class Bot(QThread):
             )
 
         # create the chain to answer questions
-        qa_chain = RetrievalQA.from_chain_type(llm=turbo_llm,
+        qa_chain = RetrievalQA.from_chain_type(
+                                               llm=turbo_llm,
                                                chain_type="stuff",
                                                retriever=retriever,
                                                return_source_documents=True
@@ -176,8 +177,6 @@ class Bot(QThread):
                 self.sig_response.emit(next_token)
             except Empty:
                 continue
-        converasation = ["USER:" + question, "\nAI:" + bot_content]
-        self.insert_data(converasation)
 
     def load_parameters(self):
         try:

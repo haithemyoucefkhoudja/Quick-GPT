@@ -1,19 +1,24 @@
-# PyQt6 GUI for Large Language Models API
+# GUI for Large Language Models API
 
 This project is a graphical user interface (GUI) developed using PyQt6 for interacting with the Large Language Models API. The GUI allows users to upload documents and use a voice recorder to input text data for processing by the API.
-
+## Donation
+Donate Bitcoin:
+```markdown
+[Button Text](https://www.blockonomics.co/pay-url/aac9917abdc443b4){: .btn}
+```
 ## Features
+- Chromadb Vectore Store: Users can store their PDF locally without needing third party DB
 
-- Upload Documents: Users can select and upload documents to be processed by the Large Language Models API. The uploaded documents can be in various formats such as PDF.
+- Upload Documents: Users can select and upload documents to be processed by the Large Language Models API. The uploaded documents can be in PDF.
 
 - Voice Recorder: The GUI includes a voice recorder feature that allows users to record their voice and convert it into text. This text data can then be sent to the Large Language Models API for processing.
 
+- Customization: You can edit largelanguagemodel.py to fit your needs make sure to keep pysignal!
 ## Prerequisites
 
 Before running the GUI, make sure you have the following installed:
 
 - Python 3.8 or above
-- PyQt6 library
 - Large Language Models API credentials
 
 ## Installation
