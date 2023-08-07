@@ -2,7 +2,6 @@
 
 This project is a graphical user interface (GUI) developed using PyQt6 for interacting with the Large Language Models API. The GUI allows users to upload documents and use a voice recorder to input text data for processing by the API.
 ## Donation
-Donate Bitcoin:
 [![Bitcoin Donate Button](https://i.stack.imgur.com/MnQ6V.png)](https://www.blockonomics.co/pay-url/aac9917abdc443b4)
 
 ## Features
