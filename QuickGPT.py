@@ -1,4 +1,3 @@
-import datetime
 import math
 import os
 import struct
@@ -23,13 +22,13 @@ from PyQt6.QtWidgets import (
     QWidget, QHBoxLayout, QProgressBar, QMessageBox, QDialog, QLineEdit, QSpinBox, QComboBox,
     QFileDialog,
 )
-from chatgpt import Bot
+from largelanguagemodel import Bot
 
 font = "Tahoma"
 basedir = os.getcwd()
 bot = Bot()
 
-directories = ['Conversation', 'UserVoiceMessages', 'Docs']
+directories = ['UserVoiceMessages', 'Docs']
 # Create the directories if they don't exist
 for directory in directories:
     if not os.path.exists(directory):
@@ -147,9 +146,6 @@ QComboBox QAbstractItemView::item:selected {
         self.max_response_spinbox = QSpinBox()
         self.max_response_spinbox.setRange(0, 1000)
         self.max_response_spinbox.setValue(bot.max_response_tokens)
-        self.top_p_spinbox = QSpinBox()
-        self.top_p_spinbox.setRange(0, 10)
-        self.top_p_spinbox.setValue(int(bot.top_P * 10))
         self.temperature_spinbox = QSpinBox()
         self.temperature_spinbox.setRange(0, 10)
         self.temperature_spinbox.setValue(int(bot.temperature * 10))
@@ -173,9 +169,6 @@ QComboBox QAbstractItemView::item:selected {
         layout.addWidget(QLabel("Max Response Limit:"))
         layout.addWidget(self.max_response_spinbox)
 
-        layout.addWidget(QLabel("top_P:"))
-        layout.addWidget(self.top_p_spinbox)
-
         layout.addWidget(QLabel("Temperature:"))
         layout.addWidget(self.temperature_spinbox)
 
@@ -190,7 +183,6 @@ QComboBox QAbstractItemView::item:selected {
         bot.model = self.models_combobox.currentText()
         bot.api_key = self.apikey_edit.text()
         bot.organization_key = self.organizationkey_edit.text()
-        bot.top_P = int(self.top_p_spinbox.text()) / 10
         bot.temperature = int(self.temperature_spinbox.text()) / 10
         bot.max_request_tokens = int(self.tokens_limit_spinbox.text())
         bot.max_response_tokens = int(self.max_response_spinbox.text())
@@ -398,7 +390,7 @@ class AutoResizableTextEdit(QWidget):
         self.voice_record_button.clicked.disconnect(self.recording_thread.start)
         self.voice_record_button.clicked.connect(self.recording_thread.stop)
         self.send_button.setDisabled(True)
-        self.voice_record_button.set_custom_Style("rgb(0, 195, 129)", "rgb(0, 195, 129)")
+        self.voice_record_button.set_custom_Style("rgb(0, 195, 129)", "rgb(0, 195, 129)", "icons/microphone-white.png")
         pass
 
     @pyqtSlot()
@@ -407,7 +399,7 @@ class AutoResizableTextEdit(QWidget):
         self.voice_record_button.clicked.disconnect(self.recording_thread.stop)
         self.voice_record_button.clicked.connect(self.recording_thread.start)
         self.send_button.setDisabled(False)
-        self.voice_record_button.set_custom_Style("rgb(80, 80, 80)", "rgb(0, 195, 129)")
+        self.voice_record_button.set_custom_Style("rgb(80, 80, 80)", "rgb(0, 195, 129)", "icons/microphone-white.png")
         pass
 
     @pyqtSlot(str)

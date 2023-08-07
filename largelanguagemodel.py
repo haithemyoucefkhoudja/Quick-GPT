@@ -12,11 +12,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import PyPDFLoader
-
+from langchain.memory import ConversationBufferMemory
 from queue import Queue, Empty
 from threading import Thread
 from langchain.callbacks.base import BaseCallbackHandler
-
 """
 in case you used function calling along with streaming you can append model chunks then test if there's valid params in json
 """
@@ -49,6 +48,7 @@ class QueueCallback(BaseCallbackHandler):
 
     def on_llm_end(self, *args, **kwargs: Any) -> None:
         return self.q.empty()
+
 
 
 class Bot(QThread):
@@ -91,6 +91,21 @@ class Bot(QThread):
         with open(indicator_file_path, "w"):
             pass
 
+    def from_speech_to_text(self, filename):
+        try:
+            audio_file = open(f"{filename}", "rb")
+            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+            return transcript.text
+        except (openai.error.RateLimitError,
+                openai.error.InvalidRequestError,
+                openai.error.AuthenticationError,
+                openai.error.APIError,
+                openai.error.ServiceUnavailableError,
+                openai.error.PermissionError,
+                openai.error.APIConnectionError,
+                openai.error.Timeout) as e:
+            return str(e)
+
     def pdf_embedding(self, doc_path, doc_name):
         if os.path.exists(f"Docs/{doc_name}_indicator"):
             return
@@ -110,7 +125,6 @@ class Bot(QThread):
         vectordb.persist()
 
     def generate_response(self, question):
-
         embedding = OpenAIEmbeddings(openai_api_key=self.api_key)
         persist_directory = 'db'
         vectordb = Chroma(persist_directory=persist_directory,
@@ -122,14 +136,15 @@ class Bot(QThread):
         # Create a Queue
         q = Queue()
         job_done = object()
-
         turbo_llm = ChatOpenAI(
-            openai_api_key=self.api_key,
-            temperature=self.temperature,
-            model_name=self.model,
-            streaming=True,
-            callbacks=[QueueCallback(q)]
-        )
+                max_tokens=self.max_response_tokens,
+                openai_api_key=self.api_key,
+                temperature=self.temperature,
+                model_name=self.model,
+                streaming=True,
+                callbacks=[QueueCallback(q)]
+            )
+
         # create the chain to answer questions
         qa_chain = RetrievalQA.from_chain_type(llm=turbo_llm,
                                                chain_type="stuff",
@@ -138,7 +153,11 @@ class Bot(QThread):
                                                )
 
         def task():
-            qa_chain(question)
+            try:
+                qa_chain(question)
+            except Exception as e:
+                self.sig_response.emit(str(e))
+                return
             q.put(job_done)
 
         # Create a thread and start the function
@@ -159,28 +178,6 @@ class Bot(QThread):
                 continue
         converasation = ["USER:" + question, "\nAI:" + bot_content]
         self.insert_data(converasation)
-
-    def from_speech_to_text(self, filename):
-        try:
-            audio_file = open(f"{filename}", "rb")
-            transcript = openai.Audio.transcribe("whisper-1", audio_file)
-            return transcript.text
-        except openai.error.RateLimitError as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.APIError as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.ServiceUnavailableError as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.PermissionError as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.APIConnectionError as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.Timeout as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.AuthenticationError as e:
-            return f"An error occurred: {str(e)}"
-        except openai.error.InvalidRequestError as e:
-            return f"An error occurred: {str(e)}"
 
     def load_parameters(self):
         try:
