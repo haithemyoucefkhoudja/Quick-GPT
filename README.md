@@ -3,9 +3,8 @@
 This project is a graphical user interface (GUI) developed using PyQt6 for interacting with the Large Language Models API. The GUI allows users to upload documents and use a voice recorder to input text data for processing by the API.
 ## Donation
 Donate Bitcoin:
-```markdown
-[<img src="https://s18955.pcdn.co/wp-content/uploads/2018/02/github.png" width="25"/>](https://www.blockonomics.co/pay-url/aac9917abdc443b4)
-```
+[Donate](https://www.blockonomics.co/pay-url/aac9917abdc443b4)
+
 ## Features
 - Chromadb Vectore Store: Users can store their PDF locally without needing third party DB
 
