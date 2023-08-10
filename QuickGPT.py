@@ -751,12 +751,18 @@ class IconsMenu(QWidget):
         telegram_link_button.set_custom_Style(hover_color="rgb(100,190,249)", color="rgb(80, 80, 80)",icon="icons/share.png")
         telegram_link_button.clicked.connect(lambda: webbrowser.open("https://t.me/+XKFgOwVjUVs4NDBk"))
         telegram_link_button.setFixedWidth(42)
-
+        # https://www.blockonomics.co/pay-url/aac9917abdc443b4
+        donate_link_button = CustomButton()
+        donate_link_button.set_custom_Style(hover_color="rgb(255, 36, 0)", color="rgb(80, 80, 80)",
+                                              icon="icons/heart.png")
+        donate_link_button.clicked.connect(lambda: webbrowser.open("https://www.blockonomics.co/pay-url/aac9917abdc443b4"))
+        donate_link_button.setFixedWidth(42)
         self.layout.addWidget(label)
         self.layout.addWidget(self.comboBox)
         self.layout.addWidget(self.add_new_pdf_button)
         self.layout.addStretch()
         self.layout.addWidget(telegram_link_button)
+        self.layout.addWidget(donate_link_button)
 
         self.layout.setAlignment(telegram_link_button, Qt.AlignmentFlag.AlignRight)
         self.layout.setAlignment(self.comboBox, Qt.AlignmentFlag.AlignLeft)
