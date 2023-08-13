@@ -12,7 +12,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import PyPDFLoader
-from langchain.memory import ConversationBufferMemory
 from queue import Queue, Empty
 from threading import Thread
 from langchain.callbacks.base import BaseCallbackHandler
@@ -59,7 +58,6 @@ class Bot(QThread):
         self.stop = False
 
         self.text = None
-        self.top_P = None
         self.temperature = None
         self.model = ""
         self.max_request_tokens = None
@@ -184,13 +182,11 @@ class Bot(QThread):
                 data = json.load(file)
                 self.api_key = str(data.get("api_key", self.api_key))
                 self.organization_key = str(data.get("organization_key", self.organization_key))
-                self.top_P = float(data.get("top_P", self.top_P))
                 self.temperature = float(data.get("temperature", self.temperature))
                 self.model = str(data.get("model", self.model))
                 self.max_request_tokens = int(data.get("token_limit", self.max_request_tokens))
                 self.max_response_tokens = int(data.get("max_response_tokens", self.max_response_tokens))
         except FileNotFoundError:
-            self.top_P = 0.9
             self.temperature = 0.7
             self.model = "gpt-3.5-turbo"
             self.max_request_tokens = 4096
