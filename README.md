@@ -37,7 +37,7 @@ Before running the GUI, make sure you have the following installed:
 
    - Obtain an API key from the Large Language Models API provider.
    - Replace the placeholder `API_KEY` in Settings panel to start use it.
-     ![Alt Text](./assets/KEY_TUTORIAL.gif)
+   - ![Alt Text](./assets/KEY_TUTORIAL.gif)
 ## Usage
 
 To run the GUI, execute the following command:
