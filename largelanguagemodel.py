@@ -4,7 +4,7 @@ import time
 from typing import Any
 
 import openai
-from PyQt6.QtCore import pyqtSignal, QThread
+from PyQt6.QtCore import pyqtSignal, QObject
 
 from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
@@ -15,6 +15,7 @@ from langchain.document_loaders import PyPDFLoader
 from queue import Queue, Empty
 from threading import Thread
 from langchain.callbacks.base import BaseCallbackHandler
+
 """
 in case you used function calling along with streaming you can append model chunks then test if there's valid params in json
 """
@@ -49,8 +50,7 @@ class QueueCallback(BaseCallbackHandler):
         return self.q.empty()
 
 
-
-class Bot(QThread):
+class Bot(QObject):
     sig_response = pyqtSignal(str)
 
     def __init__(self):
@@ -107,7 +107,6 @@ class Bot(QThread):
     def pdf_embedding(self, doc_path, doc_name):
         if os.path.exists(f"Docs/{doc_name}_indicator"):
             return
-        self.save_document_indicator(doc_name)
         pdf_loader = PyPDFLoader(doc_path)
         documents = pdf_loader.load()
         # we split the data into chunks of 1,000 characters, with an overlap
@@ -121,6 +120,8 @@ class Bot(QThread):
                                          embedding=embedding,
                                          persist_directory=persist_directory)
         vectordb.persist()
+        self.save_document_indicator(doc_name)
+        return doc_name
 
     def generate_response(self, question):
         embedding = OpenAIEmbeddings(openai_api_key=self.api_key)
@@ -129,27 +130,28 @@ class Bot(QThread):
                           embedding_function=embedding,
                           )
 
-        retriever = vectordb.as_retriever(search_kwargs={"k": 2})
+        retriever = vectordb.as_retriever(
+            search_kwargs={"k": 2})
 
         # Create a Queue
         q = Queue()
         job_done = object()
         turbo_llm = ChatOpenAI(
-                max_tokens=self.max_response_tokens,
-                openai_api_key=self.api_key,
-                temperature=self.temperature,
-                model_name=self.model,
-                streaming=True,
-                callbacks=[QueueCallback(q)]
-            )
+            max_tokens=self.max_response_tokens,
+            openai_api_key=self.api_key,
+            temperature=self.temperature,
+            model_name=self.model,
+            streaming=True,
+            callbacks=[QueueCallback(q)]
+        )
 
         # create the chain to answer questions
         qa_chain = RetrievalQA.from_chain_type(
-                                               llm=turbo_llm,
-                                               chain_type="stuff",
-                                               retriever=retriever,
-                                               return_source_documents=True
-                                               )
+            llm=turbo_llm,
+            chain_type="stuff",
+            retriever=retriever,
+            return_source_documents=True
+        )
 
         def task():
             try:

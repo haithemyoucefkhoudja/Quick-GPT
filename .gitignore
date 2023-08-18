@@ -10,3 +10,4 @@ Conversation/
 db/
 QuickGPT.spec
 OPENAI
+app.py

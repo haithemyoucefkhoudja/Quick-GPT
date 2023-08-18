@@ -3,12 +3,13 @@ import os
 import struct
 import sys
 import time
+import traceback
 import wave
 import webbrowser
 import pyaudio as pa
 import keyboard
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt, QTimer, QSize, QThread, pyqtSignal, pyqtSlot
+from PyQt6.QtCore import Qt, QTimer, QSize, QThread, pyqtSignal, pyqtSlot, QRunnable, QObject, QThreadPool
 from PyQt6.QtGui import QIcon, QAction, QFont, QPixmap
 from PyQt6.QtWidgets import (
     QApplication,
@@ -24,180 +25,74 @@ from PyQt6.QtWidgets import (
 )
 from largelanguagemodel import Bot
 
-font = "Tahoma"
-basedir = os.getcwd()
-bot = Bot()
 
-directories = ['UserVoiceMessages', 'Docs']
-# Create the directories if they don't exist
-for directory in directories:
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+class WorkerSignals(QObject):
+    '''
+    Defines the signals available from a running worker thread.
 
+    Supported signals are:
 
-def raise_error_message(message):
-    error_box = QMessageBox()
-    error_box.setFont(QFont(font, 11))
-    error_box.window().setStyleSheet("""
-    background-color: rgb(60, 60, 60)
-    color: white;
-    """)
-    error_box.setStyleSheet("""
-    background-color: rgb(60, 60, 60);
-    color: white;
-    """)
-    error_box.setIcon(QMessageBox.Icon.Critical)
-    error_box.setWindowTitle("Error")
-    error_box.setText("An error occurred:")
-    error_box.setInformativeText(message)
-    error_box.exec()
+    finished
+        No data
+
+    error
+        tuple (exctype, value, traceback.format_exc() )
+
+    result
+        object data returned from processing, anything
+
+    progress
+        int indicating % progress
+
+    '''
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+    progress = pyqtSignal(int)
 
 
-class SettingsDialog(QDialog):
-    def __init__(self, parent=None):
-        """
-        Initializes the SettingsDialog object.
-            Args:
-                parent: The parent widget (default: None).
-        """
-        super().__init__(parent)
-        self.setFixedSize(250, 450)
-        self.setWindowTitle("Settings")
-        self.setWindowIcon(QIcon(os.path.join(basedir, "icons/icon16.png")))
-        self.setFont(QFont(font, 11))
-        self.setStyleSheet("""
-                 QLineEdit, QSpinBox {
-            background-color: rgb(80, 80, 80);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px;
-        }
-        QComboBox {
-    background-color: rgb(80, 80, 80);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 1px 18px 1px 3px;
-    min-width: 6em;
-}
+class Worker(QRunnable):
+    '''
+    Worker thread
 
-QComboBox::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    width: 15px;
-    border-left-width: 0px;
-    border-left-color: gray;
-    border-left-style: solid;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
-QComboBox::down-arrow {
-    image: url(./icons/combobox_down_arrow.png);
-    height: 10px;
-    width: 10px;
-}
-QListView{
-    background-color: rgb(80, 80, 80);
-    color: white;
-    font-weight: bold;
-    show-decoration-selected: 1;
-}
-QComboBox QAbstractItemView::item {
-    border: none;
-}
-QComboBox QAbstractItemView::item:selected {
-    border: 2px solid white;
-    background: rgb(0, 195, 129);
-}
-        QDialog {
-            background-color: rgb(60, 60, 60);
-            color: white;
-            border: none;
-        }
-        QPushButton {
-        color: white;
-        }
-        QLabel {
-        color: white;
-        }
-        
-        QSpinBox::up-button, QSpinBox::down-button {
-        border: none;
-        }
-        
-        """)
-        self.apikey_edit = QLineEdit()
-        self.apikey_edit.setText(bot.api_key)
+    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
 
-        self.organizationkey_edit = QLineEdit()
-        self.organizationkey_edit.setText(bot.organization_key)
+    :param callback: The function callback to run on this worker thread. Supplied args and
+                     kwargs will be passed through to the runner.
+    :type callback: function
+    :param args: Arguments to pass to the callback function
+    :param kwargs: Keywords to pass to the callback function
 
-        self.models_combobox = QComboBox()
-        self.models_combobox.addItem("gpt-3.5-turbo")
-        self.models_combobox.addItem("gpt-3.5-turbo-16k")
-        self.models_combobox.addItem("gpt-4")
-        self.models_combobox.addItem("gpt-4-32k")
-        self.models_combobox.setCurrentText(bot.model)
-        self.models_combobox.currentIndexChanged.connect(self.models_token_limit)
-        self.tokens_limit_spinbox = QSpinBox()
-        self.models_token_limit(self.models_combobox.currentIndex())
-        self.tokens_limit_spinbox.setValue(bot.max_request_tokens)
-        self.max_response_spinbox = QSpinBox()
-        self.max_response_spinbox.setRange(0, 1000)
-        self.max_response_spinbox.setValue(bot.max_response_tokens)
-        self.temperature_spinbox = QSpinBox()
-        self.temperature_spinbox.setRange(0, 10)
-        self.temperature_spinbox.setValue(int(bot.temperature * 10))
-        save_button = CustomButton()
-        save_button.setText("Save")
-        save_button.clicked.connect(self.save_parameters)
+    '''
 
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("API KEY:"))
-        layout.addWidget(self.apikey_edit)
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
 
-        layout.addWidget(QLabel("ORGANIZATION KEY:"))
-        layout.addWidget(self.organizationkey_edit)
+        # Store constructor arguments (re-used for processing)
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
 
-        layout.addWidget(QLabel("Model:"))
-        layout.addWidget(self.models_combobox)
+        # Add the callback to our kwargs
+        self.kwargs['progress_callback'] = self.signals.progress
 
-        layout.addWidget(QLabel("Token Limit:"))
-        layout.addWidget(self.tokens_limit_spinbox)
-
-        layout.addWidget(QLabel("Max Response Limit:"))
-        layout.addWidget(self.max_response_spinbox)
-
-        layout.addWidget(QLabel("Temperature:"))
-        layout.addWidget(self.temperature_spinbox)
-
-        layout.addWidget(save_button)
-
-        self.setLayout(layout)
-
-    def save_parameters(self):
-        """
-                Saves the selected settings and updates the bot's parameters.
-                """
-        bot.model = self.models_combobox.currentText()
-        bot.api_key = self.apikey_edit.text()
-        bot.organization_key = self.organizationkey_edit.text()
-        bot.temperature = int(self.temperature_spinbox.text()) / 10
-        bot.max_request_tokens = int(self.tokens_limit_spinbox.text())
-        bot.max_response_tokens = int(self.max_response_spinbox.text())
-        bot.save_parameters()
-        bot.init_openai()
-
-    def models_token_limit(self, index):
-        if index == 0:
-            self.tokens_limit_spinbox.setRange(0, 4096)
-        elif index == 1:
-            self.tokens_limit_spinbox.setRange(0, 16384)
-        elif index == 2:
-            self.tokens_limit_spinbox.setRange(0, 8192)
-        elif index == 3:
-            self.tokens_limit_spinbox.setRange(0, 32768)
+    @pyqtSlot()
+    def run(self):
+        '''
+        Initialise the runner function with passed args, kwargs.
+        '''
+        # Retrieve args/kwargs here; and fire processing using them
+        try:
+            result = self.fn(*self.args)
+        except:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)  # Return the result of the processing
+        finally:
+            self.signals.finished.emit()  # Done
 
 
 class RecordingThread(QThread):
@@ -728,8 +623,10 @@ class Messanger(QWidget):
 
 
 class IconsMenu(QWidget):
+
     def __init__(self):
         super().__init__()
+        self.new_widget = None
         self.index = 0
         self.layout = QHBoxLayout()
         label = QLabel()
@@ -741,6 +638,13 @@ class IconsMenu(QWidget):
         self.comboBox.setFont(QFont(font, 10))
         self.setFixedWidth(510)
         self.populate_combo_box()
+
+        self.animation_label = QLabel()
+        self.animation_label.setStyleSheet("color: white;")
+        self.animation_label.setFixedWidth(42)
+        self.animation_label.setFont(QFont(font, 18))
+        self.pdf_animation = AnimationThread(self.animation_label)
+        self.threadpool = QThreadPool()
         self.add_new_pdf_button = CustomButton(icon_path="icons/plus-button.png")
         self.add_new_pdf_button.clicked.connect(self.open_navigation_bar)
         self.add_new_pdf_button.setStatusTip("Upload PDF File")
@@ -751,7 +655,7 @@ class IconsMenu(QWidget):
         telegram_link_button.set_custom_Style(hover_color="rgb(100,190,249)", color="rgb(80, 80, 80)",icon="icons/share.png")
         telegram_link_button.clicked.connect(lambda: webbrowser.open("https://t.me/+XKFgOwVjUVs4NDBk"))
         telegram_link_button.setFixedWidth(42)
-        # https://www.blockonomics.co/pay-url/aac9917abdc443b4
+
         donate_link_button = CustomButton()
         donate_link_button.set_custom_Style(hover_color="rgb(255, 36, 0)", color="rgb(80, 80, 80)",
                                               icon="icons/heart.png")
@@ -760,14 +664,23 @@ class IconsMenu(QWidget):
         self.layout.addWidget(label)
         self.layout.addWidget(self.comboBox)
         self.layout.addWidget(self.add_new_pdf_button)
+        self.layout.addWidget(self.animation_label)
         self.layout.addStretch()
         self.layout.addWidget(telegram_link_button)
         self.layout.addWidget(donate_link_button)
-
         self.layout.setAlignment(telegram_link_button, Qt.AlignmentFlag.AlignRight)
         self.layout.setAlignment(self.comboBox, Qt.AlignmentFlag.AlignLeft)
         self.layout.setAlignment(self.add_new_pdf_button, Qt.AlignmentFlag.AlignLeft)
         self.setLayout(self.layout)
+
+    def start_animation_thread(self):
+        self.pdf_animation.resume()
+
+    def stop_animation_thread(self):
+        self.pdf_animation.stop()
+
+    def add_doc_name(self, doc_name):
+        self.comboBox.addItem(doc_name)
 
     def open_navigation_bar(self):
         file_dialog = QFileDialog(self)
@@ -776,9 +689,14 @@ class IconsMenu(QWidget):
         if file_dialog.exec() == QFileDialog.DialogCode.Accepted:
             selected_files = file_dialog.selectedFiles()
             for file in selected_files:
+                # ........................................
+                self.start_animation_thread()
                 pdf_name = os.path.basename(file.split("/")[-1].split(".pdf")[0])
-                bot.pdf_embedding(file, pdf_name)
-                self.comboBox.addItem(pdf_name)
+                # Pass the function to execute
+                worker = Worker(bot.pdf_embedding, file, pdf_name) # Any other args, kwargs are passed to the run function
+                worker.signals.finished.connect(self.stop_animation_thread)
+                worker.signals.result.connect(self.add_doc_name)
+                self.threadpool.start(worker)
 
     def populate_combo_box(self):
         self.comboBox.setStyleSheet("""
@@ -831,7 +749,7 @@ QComboBox QAbstractItemView::item:selected {
 
         # Iterate over the files and add the PDF Files
         for file_name in file_names:
-            document_name = file_name.split("-properties.txt")[0]
+            document_name = file_name.split("_indicator")[0]
             self.comboBox.addItem(document_name)
 
 
@@ -894,6 +812,182 @@ class MainWindow(QMainWindow):
             self.show()
         else:
             self.hide()
+
+
+font = "Tahoma"
+basedir = os.getcwd()
+bot = Bot()
+
+directories = ['UserVoiceMessages', 'Docs']
+# Create the directories if they don't exist
+for directory in directories:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
+def raise_error_message(message):
+    error_box = QMessageBox()
+    error_box.setFont(QFont(font, 11))
+    error_box.window().setStyleSheet("""
+    background-color: rgb(60, 60, 60)
+    color: white;
+    """)
+    error_box.setStyleSheet("""
+    background-color: rgb(60, 60, 60);
+    color: white;
+    """)
+    error_box.setIcon(QMessageBox.Icon.Critical)
+    error_box.setWindowTitle("Error")
+    error_box.setText("An error occurred:")
+    error_box.setInformativeText(message)
+    error_box.exec()
+
+
+class SettingsDialog(QDialog):
+    def __init__(self, parent=None):
+        """
+        Initializes the SettingsDialog object.
+            Args:
+                parent: The parent widget (default: None).
+        """
+        super().__init__(parent)
+        self.setFixedSize(250, 450)
+        self.setWindowTitle("Settings")
+        self.setWindowIcon(QIcon(os.path.join(basedir, "icons/icon16.png")))
+        self.setFont(QFont(font, 11))
+        self.setStyleSheet("""
+                 QLineEdit, QSpinBox {
+            background-color: rgb(80, 80, 80);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        QComboBox {
+    background-color: rgb(80, 80, 80);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 0px;
+    border-left-color: gray;
+    border-left-style: solid;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+QComboBox::down-arrow {
+    image: url(./icons/combobox_down_arrow.png);
+    height: 10px;
+    width: 10px;
+}
+QListView{
+    background-color: rgb(80, 80, 80);
+    color: white;
+    font-weight: bold;
+    show-decoration-selected: 1;
+}
+QComboBox QAbstractItemView::item {
+    border: none;
+}
+QComboBox QAbstractItemView::item:selected {
+    border: 2px solid white;
+    background: rgb(0, 195, 129);
+}
+        QDialog {
+            background-color: rgb(60, 60, 60);
+            color: white;
+            border: none;
+        }
+        QPushButton {
+        color: white;
+        }
+        QLabel {
+        color: white;
+        }
+        
+        QSpinBox::up-button, QSpinBox::down-button {
+        border: none;
+        }
+        
+        """)
+        self.apikey_edit = QLineEdit()
+        self.apikey_edit.setText(bot.api_key)
+
+        self.organizationkey_edit = QLineEdit()
+        self.organizationkey_edit.setText(bot.organization_key)
+
+        self.models_combobox = QComboBox()
+        self.models_combobox.addItem("gpt-3.5-turbo")
+        self.models_combobox.addItem("gpt-3.5-turbo-16k")
+        self.models_combobox.addItem("gpt-4")
+        self.models_combobox.addItem("gpt-4-32k")
+        self.models_combobox.setCurrentText(bot.model)
+        self.models_combobox.currentIndexChanged.connect(self.models_token_limit)
+        self.tokens_limit_spinbox = QSpinBox()
+        self.models_token_limit(self.models_combobox.currentIndex())
+        self.tokens_limit_spinbox.setValue(bot.max_request_tokens)
+        self.max_response_spinbox = QSpinBox()
+        self.max_response_spinbox.setRange(0, 1000)
+        self.max_response_spinbox.setValue(bot.max_response_tokens)
+        self.temperature_spinbox = QSpinBox()
+        self.temperature_spinbox.setRange(0, 10)
+        self.temperature_spinbox.setValue(int(bot.temperature * 10))
+        save_button = CustomButton()
+        save_button.setText("Save")
+        save_button.clicked.connect(self.save_parameters)
+
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("API KEY:"))
+        layout.addWidget(self.apikey_edit)
+
+        layout.addWidget(QLabel("ORGANIZATION KEY:"))
+        layout.addWidget(self.organizationkey_edit)
+
+        layout.addWidget(QLabel("Model:"))
+        layout.addWidget(self.models_combobox)
+
+        layout.addWidget(QLabel("Token Limit:"))
+        layout.addWidget(self.tokens_limit_spinbox)
+
+        layout.addWidget(QLabel("Max Response Limit:"))
+        layout.addWidget(self.max_response_spinbox)
+
+        layout.addWidget(QLabel("Temperature:"))
+        layout.addWidget(self.temperature_spinbox)
+
+        layout.addWidget(save_button)
+
+        self.setLayout(layout)
+
+    def save_parameters(self):
+        """
+                Saves the selected settings and updates the bot's parameters.
+                """
+        bot.model = self.models_combobox.currentText()
+        bot.api_key = self.apikey_edit.text()
+        bot.organization_key = self.organizationkey_edit.text()
+        bot.temperature = int(self.temperature_spinbox.text()) / 10
+        bot.max_request_tokens = int(self.tokens_limit_spinbox.text())
+        bot.max_response_tokens = int(self.max_response_spinbox.text())
+        bot.save_parameters()
+        bot.init_openai()
+
+    def models_token_limit(self, index):
+        if index == 0:
+            self.tokens_limit_spinbox.setRange(0, 4096)
+        elif index == 1:
+            self.tokens_limit_spinbox.setRange(0, 16384)
+        elif index == 2:
+            self.tokens_limit_spinbox.setRange(0, 8192)
+        elif index == 3:
+            self.tokens_limit_spinbox.setRange(0, 32768)
 
 
 def check_shortcut():
