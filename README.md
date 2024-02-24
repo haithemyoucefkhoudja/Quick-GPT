@@ -43,12 +43,7 @@ To create an executable app, you can run the following commands:
 pip install pyinstaller
 Pyinstaller --noconsole --add-data "Config.json;." --add-data "static_files;static_files" --icon=window-icon.ico --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ex .\main.py
 ```
-
 The GUI window will open
-
-## Contributing
-
-Contributions are welcome! If you have any suggestions or improvements, please open an issue or submit a pull request.
 
 ## License
 
