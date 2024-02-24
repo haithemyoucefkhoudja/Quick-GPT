@@ -1,0 +1,168 @@
+#Central_Widget {
+background-color: rgb(57, 62, 70);
+}
+#CustomTitleBar {
+    background-color: rgb(57, 62, 70);
+    color: white;
+}
+#PromptButton {
+        background-color: rgb(26, 28, 31);
+        width: 40px;
+        height: 35px;
+        border: none;
+        border-radius: 10px;
+        padding: 2px;
+}
+#PromptButton:hover{
+
+        background-color: rgb(144, 238, 144);
+}
+#TextEditor{
+color: white;
+background-color: rgb(26, 28, 31);
+border-radius: 10px;
+padding: 5px;
+box-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
+
+}
+#CloseButton {
+        background-color: rgb(57, 62, 70);
+        color: white;
+        width: 48px;
+        height: 32px;
+        border: none;
+        padding: 2px;
+        }
+#CloseButton:hover {
+        background-color: rgb(255, 8, 76);
+    }
+
+#scrollAreaWidgetContents {
+background-color: rgb(57, 62, 70);
+border: None;
+}
+#IconsMenu
+{
+background-color: transparent;
+}
+#scrollArea {
+    background-color: transparent;
+    width: 10px;
+}
+
+#scrollArea QScrollBar {
+    background-color: transparent;
+    width: 10px;
+}
+
+#scrollArea QScrollBar::handle {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+#scrollArea QScrollBar::handle:hover {
+    background-color: rgb(120, 120, 120);
+}
+
+#scrollArea QScrollBar::sub-page, #scrollArea QScrollBar::add-page {
+    background-color: rgb(57, 62, 70);
+}
+
+#scrollArea QScrollBar::sub-line, #scrollArea QScrollBar::add-line {
+    background-color: rgb(57, 62, 70);
+}
+
+
+#MenuButton {
+        background-color: rgb(57, 62, 70);
+        width: 40px;
+        height: 35px;
+        border: none;
+        border-radius: 10px;
+        padding: 2px;
+        }
+        #MenuButton:hover {
+        background-color: rgb(120, 180, 225);
+    }
+#DonateButton{
+        background-color: rgb(57, 62, 70);
+        width: 40px;
+        height: 35px;
+        border: none;
+        border-radius: 10px;
+        padding: 2px;
+}
+#DonateButton:hover {
+        background-color: rgb(220, 20, 60);
+}
+#MessageButton {
+        background-color: rgb(34, 40, 49);
+        width: 20px;
+        height: 20px;
+        border: none;
+        border-radius: 0px;
+        padding: 2px;
+        }
+#MessageButton:hover {
+        background-color: rgb(57, 62, 70);
+    }
+#MessageWrapper {
+    height: fit-content;
+    background-color: rgb(34, 40, 49);
+    border-radius: 10px;
+}
+
+#MessageEditor { color: white;
+
+padding: 5px;
+border: None;
+background-color: rgb(34, 40, 49);
+}
+
+#FileComboBox  {
+    background-color: rgb(26, 28, 31);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 1px 5px 1px 5px;
+    min-width: 6em;
+}
+
+#FileComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 0px;
+    border-left-color: gray;
+    border-left-style: solid;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#FileComboBox::down-arrow {
+    image: url(./static_files/icons/spin-down.png);
+    height: 10px;
+    width: 10px;
+}
+#FileComboBox::up-arrow {
+    image: url(./static_files/icons/spin-up.png);
+    height: 10px;
+    width: 10px;
+}
+#FileComboBox QListView{
+    background-color: rgb(80, 80, 80);
+    border: 5px;
+    color: white;
+    font-weight: bold;
+    show-decoration-selected: 1;
+}
+#FileComboBox QAbstractItemView::item {
+    height: 32px;
+    width: 132px;
+    border: none;
+}
+
+#FileComboBox QAbstractItemView::item:selected {
+    border: 2px solid white;
+    background: rgb(0, 195, 129);
+}

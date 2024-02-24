@@ -1,0 +1,9 @@
+.idea/
+venv/
+dist/
+build/
+/Scripts/
+__pycache__/
+.env
+/Lib/
+/man/

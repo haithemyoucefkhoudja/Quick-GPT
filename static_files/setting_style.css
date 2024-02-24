@@ -1,0 +1,110 @@
+  QLineEdit, QSpinBox {
+            background-color: rgb(26, 28, 31);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        QComboBox {
+    background-color: rgb(26, 28, 31);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    min-width: 6em;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 0px;
+    border-left-color: gray;
+    border-left-style: solid;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+QComboBox::down-arrow {
+    image: url(./icons/combobox_down_arrow.png);
+    height: 10px;
+    width: 10px;
+}
+QListView{
+    background-color: rgb(26, 28, 31);
+    color: white;
+    font-weight: bold;
+    show-decoration-selected: 1;
+}
+QComboBox QAbstractItemView::item {
+    border: none;
+}
+QComboBox QAbstractItemView::item:selected {
+    border: 2px solid white;
+    background: rgb(0, 195, 129);
+}
+QComboBox QScrollBar {
+    background-color: transparent;
+    width: 5px;
+}
+QComboBox QScrollBar::handle {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+    min-height: 20px;
+}
+QComboBox QScrollBar {
+    background-color: #fff;
+}
+  QComboBox QScrollBar::sub-page,  QComboBox QScrollBar::add-page {
+    background-color: rgb(26, 28, 31);
+}
+QComboBox QScrollBar::sub-line,  QComboBox QScrollBar::add-line {
+    background-color: rgb(26, 28, 31);
+}
+        QDialog {
+            background-color: rgb(57, 62, 70);
+            color: white;
+            border: none;
+        }
+
+        QPushButton {
+        background-color: rgb(26, 28, 31);
+        border: none;
+        border-radius: 10px;
+        padding: 2px;
+        }
+        QPushButton:hover {
+        background-color: rgb(144, 238, 144);
+    }
+        background-color:rgb(26, 28, 31);
+        color: white;
+        }
+        QLabel {
+        color: white;
+        }
+
+        QSpinBox::up-button, QSpinBox::down-button {
+        border: none;
+        }
+
+QScrollBar {
+    background-color: transparent;
+    width: 10px;
+}
+
+QScrollBar::handle {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:hover {
+    background-color: rgb(120, 120, 120);
+}
+
+QScrollBar::sub-page,  QScrollBar::add-page {
+    background-color: rgb(57, 62, 70);
+}
+
+QScrollBar::sub-line,  QScrollBar::add-line {
+    background-color: rgb(57, 62, 70);
+}
