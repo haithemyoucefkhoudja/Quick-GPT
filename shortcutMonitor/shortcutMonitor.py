@@ -12,6 +12,8 @@ class ShortcutMonitor(QObject):
         super().__init__(parent)
         if sender:
             self.sender: Sender = sender
+            if self.Shortcut == '':
+                self.Shortcut = "ctrl+shift+v"
             self.sender.connect_signal('set_shortcut_signal', self.set_Shortcut)
 
         self.interval = interval

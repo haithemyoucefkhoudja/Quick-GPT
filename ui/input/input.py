@@ -15,10 +15,6 @@ from LLM.bot import Bot
 class TextEdit(QTextEdit):
     COMPLETER_OBJECT_NAME = 'CompleterPopUp'
 
-    """
-        Shortcuts
-    """
-
     def __init__(self, parent=None, bot=None, sender=None, Font=None):
         super().__init__(parent)
         self.c: QCompleter | None = None
@@ -230,7 +226,8 @@ class AutoResizableTextEdit(QWidget):
         editor_font = QFont(_configInstance.Font, 12)
         editor_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 1)
         self.sender: Sender = sender
-
+        if self.sendMessage == '':
+            self.sendMessage = "Ctrl+Return"
         self.sender.connect_signal('isLoading_signal', self.LoadingState)
         self.sender.connect_signal('set_shortcut_signal', self.setShortcut)
         self.text_Editor = TextEdit(self, bot=bot, sender=sender, Font=editor_font)

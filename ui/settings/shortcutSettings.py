@@ -54,10 +54,14 @@ class ShortcutCaptureWidget(QWidget):
     def on_editingFinished(self):
         sequence = self._keysequenceedit.keySequence()
         seq_string = sequence.toString()
+        if seq_string == '':
+            return
         self.sender.send_signal('set_shortcut_signal', (seq_string, 'show_hide'))
 
     @pyqtSlot()
     def on_send_editingFinished(self):
         sequence = self._message_keysequenceedit.keySequence()
         seq_string = sequence.toString()
+        if seq_string == '':
+            return
         self.sender.send_signal('set_shortcut_signal', (seq_string, 'send_message'))

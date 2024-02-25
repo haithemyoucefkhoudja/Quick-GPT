@@ -1,12 +1,12 @@
 import json
 import os
 from typing import Dict
-
-import openai
+from langchain_openai import ChatOpenAI
 import tiktoken
 from PyQt6.QtCore import pyqtBoundSignal
 from dotenv import load_dotenv
 from Config import _configInstance
+
 
 
 class Bot:
@@ -108,45 +108,45 @@ class Bot:
 
     def generate_response(self, template: str, progress_callback: pyqtBoundSignal) -> str:
 
-        client = openai.OpenAI(api_key=self.api_key,
-                               base_url=self.active_engine.get('base_url'),
-                               )
+
         # input = self.fill_template(template, **kwargs)
         result = ''
         try:
-            tokens: int = self.num_tokens_from_messages([
+            messages = [
                 {"role": "system", "content": "you are helpful assistant"},
                 {"role": "user", "content": template},
-            ])
+            ]
+            tokens: int = self.num_tokens_from_messages(messages)
             if tokens > self.max_request_tokens:
                 progress_callback.emit(f'\ntokens={tokens} > max_request_tokens={self.max_request_tokens}')
                 return ''
+            client:ChatOpenAI = ChatOpenAI(api_key=self.api_key,
+                            base_url=self.active_engine.get('base_url'),
+                            temperature=self.temperature,
+                            model=self.active_model.get("model_name"),
+                            max_tokens=self.max_response_tokens,
+                            )
 
-            stream = client.chat.completions.create(
-                model=self.active_model.get("model_name"),
-                messages=[
-                    {"role": "system", "content": "you are helpful assistant"},
-                    {"role": "user", "content": template},
-                ],
+            """stream = client.chat.completions.create(
+                model=,
+                messages=messages,
                 stream=True,
                 max_tokens=self.max_response_tokens,
                 stop=['</s>']
-            )
-
-            # fake_stream = ["Speaks ", "a ", "given ", "text ", "using ", "pyttsx3 ", "and ", "simulates " "audio " ,"streaming", '.']
-            for chunk in stream:
+            )"""
+            for chunk in client.stream(template):
                 """"
                 stream each token to the UI
                 """
-                progress_callback.emit(chunk.choices[0].delta.content or "")
+                progress_callback.emit(chunk.content or "")
                 # progress_callback.emit(chunk)
-                result += chunk.choices[0].delta.content or ''
+                result += chunk.content or ''
             # result = ''.join(stream)
             progress_callback.emit(f'\ntokens={tokens}')
             # return ''.join(fake_stream)
             return result
         except Exception as e:
-            raise e
+            progress_callback.emit(e.__str__())
 
     def load_engine_parameters(self):
 
