@@ -85,7 +85,7 @@ class LLMSettings(QWidget):
                 item['start'] = self.start_edit.text()
                 item['end'] = self.end_edit.text()
                 self.bot.model = item
-
+        self.bot.active_model = self.bot.models[self.models_combobox.currentIndex()]
         self.bot.temperature = int(self.temperature_spinbox.text()) / 10
         self.bot.max_request_tokens = int(self.tokens_limit_spinbox.text())
         self.bot.max_response_tokens = int(self.max_response_spinbox.text())
@@ -96,9 +96,9 @@ class LLMSettings(QWidget):
             self.models_combobox.addItem(item.get("model_name"))
 
     def changeModel(self):
-        self.bot.model = self.bot.models[self.models_combobox.currentIndex()]
-        self.start_edit.setText(self.bot.model.get('start'))
-        self.end_edit.setText(self.bot.model.get('end'))
+        self.bot.active_model = self.bot.models[self.models_combobox.currentIndex()]
+        self.start_edit.setText(self.bot.active_model.get('start'))
+        self.end_edit.setText(self.bot.active_model.get('end'))
 
     def load_engines(self):
         for item in self.bot.engines:

@@ -4,7 +4,7 @@ from PyQt6.QtCore import QFile, QTextStream
 
 class Config:
     Base_Dir = os.path.dirname(__file__)
-    Font: str = "Arial"
+    Font: str = "consolas"
     Prompt_Font_Size: int = 12
     Flash_Card_Font_Size: int = 11
     Height: int = 720

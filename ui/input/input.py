@@ -224,7 +224,8 @@ class AutoResizableTextEdit(QWidget):
         super().__init__(parent)
         # Set the font size and color of the editor text
         editor_font = QFont(_configInstance.Font, 12)
-        editor_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 1)
+        editor_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.4)
+        editor_font.setWeight(700)
         self.sender: Sender = sender
         if self.sendMessage == '':
             self.sendMessage = "Ctrl+Return"

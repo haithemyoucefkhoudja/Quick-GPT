@@ -38,7 +38,7 @@ box-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
     }
 
 #scrollAreaWidgetContents {
-background-color: rgb(57, 62, 70);
+background-color: rgba(33,32,36,255);
 border: None;
 }
 #IconsMenu
@@ -110,11 +110,18 @@ background-color: transparent;
 #MessageWrapper {
     height: fit-content;
     background-color: rgb(34, 40, 49);
-    border-radius: 10px;
+
 }
+#CodeWrapper {
+    height: fit-content;
+    background-color: rgb(34, 40, 49);
 
-#MessageEditor { color: white;
-
+}
+#scrollAreaWidgetContents{
+    background-color: rgb(34, 40, 49);
+}
+#MessageEditor {
+color: white;
 padding: 5px;
 border: None;
 background-color: rgb(34, 40, 49);

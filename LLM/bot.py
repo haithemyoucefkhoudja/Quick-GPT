@@ -1,12 +1,13 @@
+import ast
 import json
 import os
+import time
 from typing import Dict
 from langchain_openai import ChatOpenAI
 import tiktoken
 from PyQt6.QtCore import pyqtBoundSignal
 from dotenv import load_dotenv
 from Config import _configInstance
-
 
 
 class Bot:
@@ -108,7 +109,6 @@ class Bot:
 
     def generate_response(self, template: str, progress_callback: pyqtBoundSignal) -> str:
 
-
         # input = self.fill_template(template, **kwargs)
         result = ''
         try:
@@ -120,33 +120,36 @@ class Bot:
             if tokens > self.max_request_tokens:
                 progress_callback.emit(f'\ntokens={tokens} > max_request_tokens={self.max_request_tokens}')
                 return ''
-            client:ChatOpenAI = ChatOpenAI(api_key=self.api_key,
-                            base_url=self.active_engine.get('base_url'),
-                            temperature=self.temperature,
-                            model=self.active_model.get("model_name"),
-                            max_tokens=self.max_response_tokens,
-                            )
+            client: ChatOpenAI = ChatOpenAI(api_key=self.api_key,
+                                            base_url=self.active_engine.get('base_url'),
+                                            temperature=self.temperature,
+                                            model=self.active_model.get("model_name"),
+                                            max_tokens=self.max_response_tokens,
+                                            )
+            list_token = []
+            with open(_configInstance.get_path('ui/Messanger/python exe.txt')) as file:
+                List = file.read()
+                my_list = ast.literal_eval(List)
+                print(len(my_list))
 
-            """stream = client.chat.completions.create(
-                model=,
-                messages=messages,
-                stream=True,
-                max_tokens=self.max_response_tokens,
-                stop=['</s>']
-            )"""
+            _index = 0
             for chunk in client.stream(template):
+            #for content in my_list[2]:
+                content = chunk.content
                 """"
                 stream each token to the UI
                 """
-                progress_callback.emit(chunk.content or "")
-                # progress_callback.emit(chunk)
-                result += chunk.content or ''
-            # result = ''.join(stream)
-            progress_callback.emit(f'\ntokens={tokens}')
-            # return ''.join(fake_stream)
+                list_token.append(content)
+                progress_callback.emit((content or "", _index))
+                result += content or ''
+                time.sleep(0.02)
+                _index += 1
+
+            progress_callback.emit((f'\ntokens={tokens}', _index))
+            print(list_token)
             return result
         except Exception as e:
-            progress_callback.emit(e.__str__())
+            progress_callback.emit(str(e))
 
     def load_engine_parameters(self):
 

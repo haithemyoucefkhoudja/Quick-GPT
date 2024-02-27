@@ -1,8 +1,10 @@
+import time
+
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool
 from PyQt6.QtWidgets import QScrollArea, QVBoxLayout, QFrame, QSizePolicy
 from Config import _configInstance
 from LLM.bot import Bot
-from ui.Messanger._MessageUI import MessageWrapper, Message
+from ui.Messanger._MessageUI import MessageWrapper, Message, CodeWrapper
 from ui.Messanger.Message import Role
 from worker.worker import Worker
 
@@ -14,6 +16,7 @@ class Messanger(QScrollArea):
         super().__init__(parent)
         self.layout = QVBoxLayout()
         self.bot: Bot = bot
+        self.Loading = False
         self.scrollAreaWidgetContents: QFrame = QFrame()
         self.setup_ui()
         self.sender = sender
@@ -21,6 +24,8 @@ class Messanger(QScrollArea):
 
         if self.sender:
             self.sender.connect_signal('input_signal', self.add_Message)
+
+
 
     def setup_ui(self):
         # Chat. Messanger
@@ -34,7 +39,7 @@ class Messanger(QScrollArea):
             self.scrollToBottom
         )
 
-        self.setFixedSize(int(_configInstance.Width * 0.9), int(_configInstance.Height * 0.7))
+        self.setFixedSize(int(_configInstance.Width * 0.95), int(_configInstance.Height * 0.7))
         # Body that holds the widgets.
 
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
@@ -47,9 +52,15 @@ class Messanger(QScrollArea):
         self.layout.addStretch(1)
         self.layout.setSpacing(5)
 
+    def setIsloading(self, isloading:bool) -> None:
+        self.Loading = isloading
+
+
     def scrollToBottom(self) -> None:
         """ It's Just Scroll Down
         """
+        if not self.Loading:
+            return
         Max: int = self.verticalScrollBar().maximum()
 
         self.verticalScrollBar().setValue(
@@ -74,12 +85,13 @@ class Messanger(QScrollArea):
         self.layout.addWidget(MessageWrapper(message={'content': data, 'Role': Role.User}))
         worker = Worker(fn=self.addBotMessage, **{'template': data})
         botWrapper = MessageWrapper(message={'content': '', 'Role': Role.Bot}, worker=worker)
-
         self.layout.addWidget(botWrapper)
+        self.setIsloading(True)
         self.threadpool.start(worker)
 
     def addBotMessage(self, *args, **kwargs) -> str:
         result = self.bot.generate_response(**kwargs)
+        self.setIsloading(False)
         return result
 
     def keyPressEvent(self, event) -> None:

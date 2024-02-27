@@ -44,6 +44,26 @@ pip install pyinstaller
 Pyinstaller --noconsole --add-data "Config.json;." --add-data "static_files;static_files" --icon=window-icon.ico --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ex .\main.py
 ```
 The GUI window will open
+## Python 3.10 Pyinstaller Compatibility Issue
+
+**Description:**
+If you're using Python 3.10, you might encounter a specific error related to the way instructions are analyzed `IndexError: tuple index out of range`.  Here's how to fix it:
+
+**Instructions**
+1. **Locate the `dis.py` file:**
+   * Find your Python installation folder (e.g., `C:\Users\[YourUsername]\AppData\Local\Programs\Python\Python310\Lib`)
+   * Open the `Lib` folder and locate the `dis.py` file.
+
+2. **Edit the `dis.py` file:**
+   * **Important:** Create a backup copy of `dis.py` before making changes.
+   * Open `dis.py` in a text editor (make sure you have the permissions to edit files in this directory).
+   * Find the `def _unpack_opargs` function.
+   * Inside the `else` statement within this function, add the following line. Ensure correct indentation:
+
+   ```python
+   else:
+       arg = None
+       extended_arg = 0
 
 ## License
 

@@ -3,7 +3,7 @@ import string
 import time
 from enum import Enum
 
-from typing_extensions import Optional
+from typing import Optional
 
 
 class Role(Enum):
@@ -55,6 +55,5 @@ class Message:
         self.content = content
 
     def setmessage(self, message: dict)-> None:
-        print(message)
         self.content = message.get('content')
         self.role = message.get('Role')

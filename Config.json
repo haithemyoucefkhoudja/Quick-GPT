@@ -4,9 +4,9 @@
             "base_url": "https://api.together.xyz",
             "temperature": 0.5,
             "active_model": {
-                "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
-                "start": "<|im_start|>",
-                "end": "<|im_end|"
+                "model_name": "deepseek-ai/deepseek-coder-33b-instruct",
+                "start": "",
+                "end": ""
             },
             "max_request_tokens": 750,
             "max_response_tokens": 750,
@@ -236,6 +236,8 @@
         "paraphrase": "Paraphrase the given text to express the same meaning in different words.",
         "spell_check": "Check the spelling of the given text and provide corrections.",
         "explain": "explain the given text In simple way",
-        "generate_solutions": " generate solutions of the given Text and Questions"
+        "generate_solutions": " generate solutions of the given Text and Questions",
+        "turn_to_code": " turn this text above to code ",
+        "web_scraping": "\"Create one  Python script! for the following:\n\nWeb Scraping using beautifulsoup4:\nContent to Extract: Clearly define the text content you want to target (e.g., news headlines, article bodies, product descriptions, etc.).\n\nText-to-Speech with gTTS:\nLanguage: The language for the speech output.\nSplitting Logic: Do you want to convert the entire scraped text into a single audio file, or create separate audio files for individual sections (like separate news headlines)?\ndirectory to save files \"C:\\Users\\haithem-yk\\Desktop\\audios\"\nTarget Website:\n\""
     }
 }

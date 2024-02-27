@@ -45,6 +45,7 @@ class BaseEditor(QTextEdit):
 
         self.setLineWrapColumnOrWidth(self.Max_Characters_Line)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.setLineWrapMode(self.LineWrapMode.FixedColumnWidth)
         self.setWordWrapMode(self.wordWrapMode().WordWrap)
         pass

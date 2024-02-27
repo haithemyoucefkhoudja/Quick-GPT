@@ -4,6 +4,7 @@ import traceback
 from typing import Any, Callable
 from PyQt6.QtCore import  pyqtSlot, pyqtSignal, QObject, QRunnable
 
+
 class WorkerSignals(QObject):
     """
     Defines the signals available from a running worker thread.
@@ -26,7 +27,7 @@ class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
     result = pyqtSignal(object)
-    progress = pyqtSignal(str)
+    progress = pyqtSignal(object)
 
 
 class Worker(QRunnable):

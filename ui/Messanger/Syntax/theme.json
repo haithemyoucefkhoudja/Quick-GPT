@@ -1,0 +1,141 @@
+{
+    "theme": {
+        "name": "default-dark",
+        "version": "1.0",
+
+        "syntax": [
+            {
+                "default": {
+                    "color": "#abb2bf",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": false
+                    }
+                }
+            },
+            {
+                "keyword": {
+                    "color": "#c678dd",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "bold",
+                        "italic": false
+                    }
+                }
+            },
+            {
+                "classes": {
+                    "color": "#C68F55",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": false
+                    }
+                }
+            },
+            {
+                "functions": {
+                    "color": "#61afd1",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": false
+                    }
+                }
+            },
+            {
+                "function_def": {
+                    "color": "#61afd1",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            },
+            {
+                "string": {
+                    "color": "#98c379",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            },
+            {
+                "types": {
+                    "color": "#56b6c2",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            },
+            {
+                "keyargs": {
+                    "color": "#c678dd",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            },
+            {
+                "brackets": {
+                    "color": "#c678dd",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            },
+            {
+                "comments": {
+                    "color": "#777777",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            },
+            {
+                "constants": {
+                    "color": "#d19a5e",
+                    "paper-color": "#282c34",
+                    "font": {
+                        "family": "consolas",
+                        "font-size": 12,
+                        "font-weight": "normal",
+                        "italic": true
+                    }
+                }
+            }
+        ]
+    }
+}
