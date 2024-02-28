@@ -50,6 +50,7 @@ class MessageEditor(BaseEditor):
 
     def insertPlainText(self, text):
         super().insertPlainText(text)
+        print('text is reaching:', text)
 
     def setMd(self) -> None:
         self.setTextInteractionFlags(
@@ -293,6 +294,7 @@ class MessageWrapper(QFrame, Message):
     @pyqtSlot(tuple)
     def append_text(self, bot_token: tuple) -> None:
         _bot_text, _index, *_ = bot_token or ("", 0)  # Provide defaults
+        print("bot_ token:", bot_token)
         pattern = r"`{1,3}"
         editor_ = self.text_editors[len(self.text_editors) - 1]
         pattern_found = True
@@ -363,9 +365,9 @@ class MessageWrapper(QFrame, Message):
         __label.setMaximumSize(32, 32)
         if self.role == Role.User:
 
-            path = 'static_files/icons/user.png'
+            path = _configInstance.get_path('static_files/icons/user.png')
         else:
-            path = 'static_files/icons/bot.png'
+            path = _configInstance.get_path('static_files/icons/bot.png')
         __label.setImage(path)
 
         info_layout = QHBoxLayout()

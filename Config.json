@@ -4,9 +4,9 @@
             "base_url": "https://api.together.xyz",
             "temperature": 0.5,
             "active_model": {
-                "model_name": "deepseek-ai/deepseek-coder-33b-instruct",
-                "start": "",
-                "end": ""
+                "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+                "start": "<|im_start|>",
+                "end": "<|im_end|"
             },
             "max_request_tokens": 750,
             "max_response_tokens": 750,

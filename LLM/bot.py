@@ -1,4 +1,3 @@
-import ast
 import json
 import os
 import time
@@ -108,10 +107,10 @@ class Bot:
           See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.""")
 
     def generate_response(self, template: str, progress_callback: pyqtBoundSignal) -> str:
-
-        # input = self.fill_template(template, **kwargs)
-        result = ''
         try:
+            # input = self.fill_template(template, **kwargs)
+            result = ''
+
             messages = [
                 {"role": "system", "content": "you are helpful assistant"},
                 {"role": "user", "content": template},
@@ -127,10 +126,10 @@ class Bot:
                                             max_tokens=self.max_response_tokens,
                                             )
             list_token = []
-            with open(_configInstance.get_path('ui/Messanger/python exe.txt')) as file:
+            """with open(_configInstance.get_path('ui/Messanger/python exe.txt')) as file:
                 List = file.read()
                 my_list = ast.literal_eval(List)
-                print(len(my_list))
+                print(len(my_list))"""
 
             _index = 0
             for chunk in client.stream(template):
@@ -146,10 +145,13 @@ class Bot:
                 _index += 1
 
             progress_callback.emit((f'\ntokens={tokens}', _index))
-            print(list_token)
             return result
+        except FileNotFoundError as e:
+            progress_callback.emit(('File Not Found Error:', -1))
+            print('File Not Found Error:', e.args)
         except Exception as e:
-            progress_callback.emit(str(e))
+            progress_callback.emit((str(e), -1))
+            print('e:', str(e))
 
     def load_engine_parameters(self):
 
@@ -163,6 +165,7 @@ class Bot:
             Python  WILL LOAD IT FROM THE .env file
             """
             self.api_key = os.getenv('API_KEY')
+
             self.commands = config_data["commands"]
             engines = config_data["engines"]
             self.engines = engines.keys()

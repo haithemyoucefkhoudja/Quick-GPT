@@ -22,7 +22,7 @@ class NeutronLexer(QsciLexerCustom):
         self.language_name = language_name
         self.theme_json = None
         if theme is None:
-            self.theme = _configInstance.get_path('ui/Messanger/Syntax/theme.json')
+            self.theme = _configInstance.get_path('theme.json')
         else:
             self.theme = theme
 
