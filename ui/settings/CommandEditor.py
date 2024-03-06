@@ -62,8 +62,8 @@ class CommandWrapper(QFrame):
         super().__init__(parent, )
         if save_function:
             self.save_function = save_function
-        self.Editor: CommandEditor = CommandEditor(parent=self, worker=worker)
 
+        self.Editor: CommandEditor = CommandEditor(parent=self, worker=worker)
         self.Edit_Button = CustomButton(self.BUTTON_OBJECT_NAME,
                                         self.BUTTON_SIZE, self.BUTTON_SIZE,
                                         buttons={
@@ -88,8 +88,8 @@ class CommandWrapper(QFrame):
     def init_GUI(self):
         self.setObjectName(self.OBJECT_NAME)
         buttons_layout = QHBoxLayout()
-        buttons_layout.addStretch()
         buttons_layout.addWidget(self.Edit_Button)
+        buttons_layout.addStretch()
         wrapper_layout = QVBoxLayout()
         wrapper_layout.addWidget(self.Editor)
         wrapper_layout.addLayout(buttons_layout)

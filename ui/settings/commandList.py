@@ -1,4 +1,3 @@
-from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QListWidget,  QScrollArea, QHBoxLayout,  QListWidgetItem, QMenu,  QWidget
 
@@ -33,7 +32,6 @@ class CommandList(QListWidget):
             self.addItem(new_item)
 
 
-
 class CommandWidget(QWidget):
     def __init__(self, parent=None, bot=None, sender=None):
         super().__init__(parent)
@@ -50,11 +48,6 @@ class CommandWidget(QWidget):
         self.command_list.itemClicked.connect(self.edit_item)
 
         self.text_display = CommandWrapper(self, save_function=self.set_Command)
-
-        self.text_display.setSizePolicy(
-            QtWidgets.QSizePolicy.Policy.Maximum,
-            QtWidgets.QSizePolicy.Policy.Maximum
-        )
 
         # --- Main layout setup ---
         main_layout = QHBoxLayout()
@@ -110,7 +103,6 @@ QScrollBar::sub-line,  QScrollBar::add-line {
                     background-color: rgb(57, 62, 70); 
                 """)
         self.text_display.setVisible(False)
-
 
         right_side_layout.addWidget(text_scroll)
         main_layout.addLayout(right_side_layout)
