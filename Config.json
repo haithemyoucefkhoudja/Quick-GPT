@@ -1,228 +1,269 @@
 {
     "engines": {
-        "together": {
-            "base_url": "https://api.together.xyz",
+        "active_engine": "groq",
+        "engines_data": [
+            {
+                "name": "together",
+                "base_url": "https://api.together.xyz",
+                "temperature": 0.5,
+                "active_model": {
+                    "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+                    "start": "<|im_start|>",
+                    "end": "<|im_end|"
+                },
+                "max_request_tokens": 750,
+                "max_response_tokens": 750,
+                "models": [
+                    {
+                        "model_name": "zero-one-ai/Yi-34B-Chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Austism/chronos-hermes-13b",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "deepseek-ai/deepseek-coder-33b-instruct",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "garage-bAInd/Platypus2-70B-instruct",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Gryphe/MythoMax-L2-13b",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "lmsys/vicuna-13b-v1.5",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "lmsys/vicuna-7b-v1.5",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "codellama/CodeLlama-13b-Instruct-hf",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "codellama/CodeLlama-34b-Instruct-hf",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "codellama/CodeLlama-70b-Instruct-hf",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "codellama/CodeLlama-7b-Instruct-hf",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/llama-2-13b-chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/llama-2-70b-chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/llama-2-7b-chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "mistralai/Mistral-7B-Instruct-v0.1",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "mistralai/Mistral-7B-Instruct-v0.2",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "NousResearch/Nous-Capybara-7B-V1p9",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+                        "start": "<|im_start|>",
+                        "end": "<|im_end|"
+                    },
+                    {
+                        "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "NousResearch/Nous-Hermes-llama-2-7b",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "NousResearch/Nous-Hermes-Llama2-13b",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "NousResearch/Nous-Hermes-2-Yi-34B",
+                        "start": "<|im_start|>",
+                        "end": "<|im_end|>"
+                    },
+                    {
+                        "model_name": "openchat/openchat-3.5-1210",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Open-Orca/Mistral-7B-OpenOrca",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/Qwen-7B-Chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Qwen/Qwen1.5-0.5B-Chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Qwen/Qwen1.5-1.8B-Chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Qwen/Qwen1.5-72B-Chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "snorkelai/Snorkel-Mistral-PairRM-DPO",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/alpaca-7b",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "teknium/OpenHermes-2-Mistral-7B",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "teknium/OpenHermes-2p5-Mistral-7B",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/falcon-40b-instruct",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/falcon-7b-instruct",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/Llama-2-7B-32K-Instruct",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/RedPajama-INCITE-7B-Chat",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "togethercomputer/StripedHyena-Nous-7B",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Undi95/ReMM-SLERP-L2-13B",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "Undi95/Toppy-M-7B",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "WizardLM/WizardLM-13B-V1.2",
+                        "start": "",
+                        "end": ""
+                    },
+                    {
+                        "model_name": "upstage/SOLAR-10.7B-Instruct-v1.0",
+                        "start": "",
+                        "end": ""
+                    }
+                ]
+            },
+            {
+                "name": "groq",
+                "base_url": "https://api.groq.com/openai/v1",
+                "temperature": 0.5,
+                "active_model": {
+                    "model_name": "mixtral-8x7b-32768",
+                    "start": "",
+                    "end": ""
+                },
+                "max_request_tokens": 750,
+                "max_response_tokens": 750,
+                "models": [
+                    {
+                        "model_name": "mixtral-8x7b-32768",
+                        "start": "",
+                        "end": ""
+                    }
+                ]
+            }
+        ],
+        "groq": {
+            "base_url": "https://api.groq.com/openai/v1",
             "temperature": 0.5,
             "active_model": {
-                "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
-                "start": "<|im_start|>",
-                "end": "<|im_end|"
+                "model_name": "mixtral-8x7b-32768",
+                "start": "",
+                "end": ""
             },
             "max_request_tokens": 750,
             "max_response_tokens": 750,
             "models": [
                 {
-                    "model_name": "zero-one-ai/Yi-34B-Chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Austism/chronos-hermes-13b",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "deepseek-ai/deepseek-coder-33b-instruct",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "garage-bAInd/Platypus2-70B-instruct",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Gryphe/MythoMax-L2-13b",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "lmsys/vicuna-13b-v1.5",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "lmsys/vicuna-7b-v1.5",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "codellama/CodeLlama-13b-Instruct-hf",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "codellama/CodeLlama-34b-Instruct-hf",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "codellama/CodeLlama-70b-Instruct-hf",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "codellama/CodeLlama-7b-Instruct-hf",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/llama-2-13b-chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/llama-2-70b-chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/llama-2-7b-chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "mistralai/Mistral-7B-Instruct-v0.1",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "mistralai/Mistral-7B-Instruct-v0.2",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "NousResearch/Nous-Capybara-7B-V1p9",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
-                    "start": "<|im_start|>",
-                    "end": "<|im_end|"
-                },
-                {
-                    "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-SFT",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "NousResearch/Nous-Hermes-llama-2-7b",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "NousResearch/Nous-Hermes-Llama2-13b",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "NousResearch/Nous-Hermes-2-Yi-34B",
-                    "start": "<|im_start|>",
-                    "end": "<|im_end|>"
-                },
-                {
-                    "model_name": "openchat/openchat-3.5-1210",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Open-Orca/Mistral-7B-OpenOrca",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/Qwen-7B-Chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Qwen/Qwen1.5-0.5B-Chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Qwen/Qwen1.5-1.8B-Chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Qwen/Qwen1.5-72B-Chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "snorkelai/Snorkel-Mistral-PairRM-DPO",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/alpaca-7b",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "teknium/OpenHermes-2-Mistral-7B",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "teknium/OpenHermes-2p5-Mistral-7B",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/falcon-40b-instruct",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/falcon-7b-instruct",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/Llama-2-7B-32K-Instruct",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/RedPajama-INCITE-7B-Chat",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "togethercomputer/StripedHyena-Nous-7B",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Undi95/ReMM-SLERP-L2-13B",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "Undi95/Toppy-M-7B",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "WizardLM/WizardLM-13B-V1.2",
-                    "start": "",
-                    "end": ""
-                },
-                {
-                    "model_name": "upstage/SOLAR-10.7B-Instruct-v1.0",
+                    "model_name": "mixtral-8x7b-32768",
                     "start": "",
                     "end": ""
                 }

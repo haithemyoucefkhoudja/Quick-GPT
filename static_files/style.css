@@ -6,23 +6,23 @@ background-color: rgb(57, 62, 70);
     color: white;
 }
 #PromptButton {
-        background-color: rgb(26, 28, 31);
+        background-color: rgb(57, 62, 70);
+        border: 1px solid white;
         width: 40px;
         height: 35px;
-        border: none;
         border-radius: 10px;
         padding: 2px;
 }
 #PromptButton:hover{
-
+        border: none;
         background-color: rgb(144, 238, 144);
 }
 #TextEditor{
 color: white;
-background-color: rgb(26, 28, 31);
+background-color: rgb(57, 62, 70);
 border-radius: 10px;
+border: 1px solid white;
 padding: 5px;
-box-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
 
 }
 #CloseButton {
@@ -97,7 +97,7 @@ background-color: transparent;
         background-color: rgb(220, 20, 60);
 }
 #MessageButton {
-        background-color: rgb(34, 40, 49);
+        background-color: rgb(57, 62, 70);
         width: 20px;
         height: 20px;
         border: none;
@@ -105,26 +105,26 @@ background-color: transparent;
         padding: 2px;
         }
 #MessageButton:hover {
-        background-color: rgb(57, 62, 70);
+        background-color: rgb(57, 62, 75);
     }
 #MessageWrapper {
     height: fit-content;
-    background-color: rgb(34, 40, 49);
+    background-color: rgb(57, 62, 70);
 
 }
 #CodeWrapper {
     height: fit-content;
-    background-color: rgb(34, 40, 49);
+    background-color: rgb(57, 62, 70);
 
 }
 #scrollAreaWidgetContents{
-    background-color: rgb(34, 40, 49);
+    background-color: rgb(57, 62, 70);
 }
 #MessageEditor {
 color: white;
 padding: 5px;
 border: None;
-background-color: rgb(34, 40, 49);
+background-color: rgb(57, 62, 70);
 }
 
 #FileComboBox  {

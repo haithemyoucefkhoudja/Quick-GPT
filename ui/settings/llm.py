@@ -15,15 +15,11 @@ class LLMSettings(QWidget):
         self.setFont(Font)
         self.engines_combobox = QComboBox()
         self.load_engines()
-        self.engines_combobox.currentIndexChanged.connect(self.swtich_Engine)
         self.engines_combobox.setCurrentText(bot.active_engine.get('name'))
         self.base_url = QLineEdit()
         self.base_url.setText(bot.active_engine.get("base_url"))
-        self.start_edit = QLineEdit()
-        self.start_edit.setText(bot.active_model.get("start"))
-        self.end_edit = QLineEdit()
-        self.end_edit.setText(bot.active_model.get("end"))
         self.models_combobox = QComboBox()
+        self.engines_combobox.currentIndexChanged.connect(self.swtich_Engine)
         self.load_comboBox()
         self.models_combobox.currentIndexChanged.connect(self.changeModel)
         self.models_combobox.setCurrentText(bot.active_model.get("model_name"))
@@ -50,10 +46,6 @@ class LLMSettings(QWidget):
 
         layout.addWidget(QLabel("base_url:"))
         layout.addWidget(self.base_url)
-        layout.addWidget(QLabel("start Prompt:"))
-        layout.addWidget(self.start_edit)
-        layout.addWidget(QLabel("End Prompt:"))
-        layout.addWidget(self.end_edit)
 
         layout.addWidget(QLabel("Model:"))
         layout.addWidget(self.models_combobox)
@@ -75,6 +67,17 @@ class LLMSettings(QWidget):
         """
         switch the current llm engine
         """
+        self.bot.load_engine_parameters(self.engines_combobox.currentText())
+        base_url = self.bot.active_engine.get("base_url")
+        self.base_url.setText(base_url)
+        self.tokens_limit_spinbox.setValue(self.bot.max_request_tokens)
+        self.models_combobox.clear()
+        self.load_comboBox()
+        self.models_combobox.setCurrentText(self.bot.active_model.get("model_name"))
+        self.changeModel()
+        self.max_response_spinbox.setValue(self.bot.max_response_tokens)
+        self.temperature_spinbox.setValue(int(self.bot.temperature * 10))
+
 
     def save_parameters(self):
         """
@@ -82,9 +85,8 @@ class LLMSettings(QWidget):
         """
         for item in self.bot.models:
             if self.models_combobox.currentText() == item.get("model_name"):
-                item['start'] = self.start_edit.text()
-                item['end'] = self.end_edit.text()
                 self.bot.model = item
+
         self.bot.active_model = self.bot.models[self.models_combobox.currentIndex()]
         self.bot.temperature = int(self.temperature_spinbox.text()) / 10
         self.bot.max_request_tokens = int(self.tokens_limit_spinbox.text())
@@ -97,10 +99,9 @@ class LLMSettings(QWidget):
 
     def changeModel(self):
         self.bot.active_model = self.bot.models[self.models_combobox.currentIndex()]
-        self.start_edit.setText(self.bot.active_model.get('start'))
-        self.end_edit.setText(self.bot.active_model.get('end'))
+
 
     def load_engines(self):
         for item in self.bot.engines:
-            self.engines_combobox.addItem(item)
+            self.engines_combobox.addItem(item.get('name'))
         pass

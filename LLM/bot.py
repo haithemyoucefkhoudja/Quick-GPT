@@ -1,6 +1,5 @@
 import json
 import os
-import time
 from typing import Dict
 from langchain_openai import ChatOpenAI
 import tiktoken
@@ -20,14 +19,11 @@ class Bot:
     """
     List Of engines
     """
-    engines: list[str] = []
+    engines: list[Dict] = []
     """
     Active Engine
     """
-    active_engine: Dict = {
-        "name": 'together',
-        "base_url": 'https://api.together.xyz',
-    }
+    active_engine: Dict = {}
     """
     Dictonary of commands
     """
@@ -45,8 +41,6 @@ class Bot:
     """
     active_model: Dict = {
         "model_name": '',
-        "start": '',
-        "end": ''
     }
     """"
     list of models
@@ -67,7 +61,7 @@ class Bot:
 
     def __init__(self):
         super().__init__()
-        self.load_engine_parameters()
+        self.load_engine_parameters(None)
 
     @staticmethod
     def fill_template(template, **kwargs):
@@ -141,10 +135,7 @@ class Bot:
                 list_token.append(content)
                 progress_callback.emit((content or "", _index))
                 result += content or ''
-                time.sleep(0.02)
                 _index += 1
-
-            progress_callback.emit((f'\ntokens={tokens}', _index))
             return result
         except FileNotFoundError as e:
             progress_callback.emit(('File Not Found Error:', -1))
@@ -153,7 +144,7 @@ class Bot:
             progress_callback.emit((str(e), -1))
             print('e:', str(e))
 
-    def load_engine_parameters(self):
+    def load_engine_parameters(self, name):
 
         try:
             with open(self.Config_file, "r") as file:
@@ -165,23 +156,22 @@ class Bot:
             Python  WILL LOAD IT FROM THE .env file
             """
             self.api_key = os.getenv('API_KEY')
-
             self.commands = config_data["commands"]
-            engines = config_data["engines"]
-            self.engines = engines.keys()
-            engine_data = config_data["engines"][self.active_engine.get('name')]
-            update_data = {k: v for k, v in engine_data.items() if v is not None}
+            engines_data = config_data["engines"]['engines_data']
+            self.engines = [engine for engine in engines_data]
+
+            for engine in engines_data:
+                if engine.get('name') == config_data["engines"]['active_engine']:
+                    self.active_engine = engine
+            for engine in engines_data:
+                if engine.get('name') == name:
+                    self.active_engine = engine
+
+            update_data = {k: v for k, v in self.active_engine.items() if v is not None}
             self.__dict__.update(update_data)
         except FileNotFoundError:
-            self.temperature = 0.7
-            self.active_model = {
-                "model_name": "zero-one-ai/Yi-34B-Chat",
-                "start": "",
-                "end": ""
-            }
-            self.max_request_tokens = 4096
-            self.max_response_tokens = 750
-            self.api_key = ""
+            print(f"Error: '{self.Config_file}' not found.")
+
 
     def save_commands(self):
         try:
@@ -195,17 +185,13 @@ class Bot:
         except FileNotFoundError:
             pass
 
-    def save_engine_parameters(self):
+    def save_engine_parameters(self, index: int):
         try:
             with open(self.Config_file, "r") as file:
                 config_data = json.load(file)
-            config_data["engines"][self.active_engine.get('name')] = {
-                "base_url": self.active_engine.get('base_url'),
-                "temperature": self.temperature,
-                "active_model": self.active_model,
-                "max_request_tokens": self.max_request_tokens,
-                "max_response_tokens": self.max_response_tokens,
-                "models": self.models,
+            config_data['engines']['active_engine'] = self.active_engine.get('name')
+            config_data['engines']['engines_data'][index] = {
+
             }
             with open(self.Config_file, "w") as file:
                 json.dump(config_data, file, indent=4)

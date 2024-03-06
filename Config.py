@@ -7,8 +7,8 @@ class Config:
     Font: str = "consolas"
     Prompt_Font_Size: int = 12
     Flash_Card_Font_Size: int = 11
-    Height: int = 720
-    Width: int = 560
+    Height: int = 780
+    Width: int = 920
 
     def get_path(self, file_path: str):
         """Returns the directory of the main Python script."""

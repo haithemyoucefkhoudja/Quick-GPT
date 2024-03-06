@@ -50,7 +50,6 @@ class MessageEditor(BaseEditor):
 
     def insertPlainText(self, text):
         super().insertPlainText(text)
-        print('text is reaching:', text)
 
     def setMd(self) -> None:
         self.setTextInteractionFlags(
@@ -96,6 +95,7 @@ class CodeWrapper(QFrame):
         super().__init__(parent, )
         self.Editor: CodeEditor = CodeEditor(parent=self)
         self.CodeResult: CodeEditor = CodeEditor(parent=self)
+        self.CodeResult.setFixedHeight(0)
         self.Voice: CustomButton = CustomButton(self.BUTTON_OBJECT_NAME, self.BUTTON_SIZE,
                                                 buttons={
                                                     "default": {"icon": "static_files/icons/voice.png",
@@ -124,7 +124,6 @@ class CodeWrapper(QFrame):
         pass
 
     def stop_process(self) -> None:
-
         self.worker_thread.Stop()
         self.Voice.setup_button('default')
 
@@ -229,13 +228,8 @@ class MessageWrapper(QFrame, Message):
         self.text_editors: [Optional[MessageEditor, CodeWrapper]] = []
 
         self.fences: list = []
-
         self.in_code_block = False
 
-        if worker:
-            self.worker: Worker = worker
-            self.worker.signals.progress.connect(self.append_text)
-            self.worker.signals.result.connect(self.save_message)
         self.Editor: MessageEditor = MessageEditor(parent=self)
         self.Voice: CustomButton = CustomButton(self.BUTTON_OBJECT_NAME, self.BUTTON_SIZE,
                                                 buttons={
@@ -247,13 +241,18 @@ class MessageWrapper(QFrame, Message):
                                                 )
         self.speech_thread = QThread()
         self.speech_worker = None
+
         if message and message.get('content') == '':
             self.init_GUI()
+        if worker:
+            self.worker: Worker = worker
+            self.worker.signals.progress.connect(self.append_text)
+            self.worker.signals.result.connect(self.save_message)
         if message and message.get('content') != '':
             self.setmessage(message)
             self.init_GUI()
-            self.add_text_editor()
             self.appendUserText(message.get('content'))
+
             self.save_message(message.get('content'))
 
 
@@ -272,7 +271,7 @@ class MessageWrapper(QFrame, Message):
         self.Voice.setup_button('stop')
 
     def appendUserText(self, text: str):
-        editor_ = self.text_editors[len(self.text_editors) - 1]
+        editor_ = self.text_editors[-1]
         editor_.insertPlainText(text)
 
     def is_sequential(self, list_of_maps):
@@ -294,9 +293,8 @@ class MessageWrapper(QFrame, Message):
     @pyqtSlot(tuple)
     def append_text(self, bot_token: tuple) -> None:
         _bot_text, _index, *_ = bot_token or ("", 0)  # Provide defaults
-        print("bot_ token:", bot_token)
         pattern = r"`{1,3}"
-        editor_ = self.text_editors[len(self.text_editors) - 1]
+        editor_ = self.text_editors[-1]
         pattern_found = True
         match = re.search(pattern, _bot_text)
 
