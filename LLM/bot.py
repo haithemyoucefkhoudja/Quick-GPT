@@ -191,7 +191,13 @@ class Bot:
                 config_data = json.load(file)
             config_data['engines']['active_engine'] = self.active_engine.get('name')
             config_data['engines']['engines_data'][index] = {
-
+                "name": self.active_engine.get('name'),
+                "base_url": self.active_engine.get('base_url'),
+                "temperature": self.temperature,
+                "active_model": self.active_model,
+                "max_request_tokens": self.max_request_tokens,
+                "max_response_tokens": self.max_response_tokens,
+                "models": self.models,
             }
             with open(self.Config_file, "w") as file:
                 json.dump(config_data, file, indent=4)

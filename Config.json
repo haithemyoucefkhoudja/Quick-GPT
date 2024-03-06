@@ -7,11 +7,11 @@
                 "base_url": "https://api.together.xyz",
                 "temperature": 0.5,
                 "active_model": {
-                    "model_name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
-                    "start": "<|im_start|>",
-                    "end": "<|im_end|"
+                    "model_name": "zero-one-ai/Yi-34B-Chat",
+                    "start": "",
+                    "end": ""
                 },
-                "max_request_tokens": 750,
+                "max_request_tokens": 800,
                 "max_response_tokens": 750,
                 "models": [
                     {
@@ -240,7 +240,7 @@
                     "start": "",
                     "end": ""
                 },
-                "max_request_tokens": 750,
+                "max_request_tokens": 1000,
                 "max_response_tokens": 750,
                 "models": [
                     {

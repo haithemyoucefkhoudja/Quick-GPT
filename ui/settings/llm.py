@@ -91,7 +91,7 @@ class LLMSettings(QWidget):
         self.bot.temperature = int(self.temperature_spinbox.text()) / 10
         self.bot.max_request_tokens = int(self.tokens_limit_spinbox.text())
         self.bot.max_response_tokens = int(self.max_response_spinbox.text())
-        self.bot.save_engine_parameters()
+        self.bot.save_engine_parameters(self.engines_combobox.currentIndex())
 
     def load_comboBox(self):
         for item in self.bot.models:
