@@ -1,15 +1,54 @@
-from PyQt6.QtCore import Qt,  pyqtSlot
-from PyQt6.QtGui import QFont, QTextCursor, QFontMetrics
+from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtGui import QFont, QTextCursor
 from PyQt6.QtWidgets import (
     QLabel,
     QWidget, QHBoxLayout, QProgressBar,
     QTextEdit, QCompleter
 )
+from queue import Queue
 from Config import _configInstance
 from ui.base_elements.CustomButton import CustomButton
 from Settings_.settingsObject import settings
 from ui.Transporter.Transporter import Sender
 from LLM.bot import Bot
+import re
+from typing import Dict
+
+
+def parse_config(config_text: str) -> Queue:
+    """Parses the configuration text and extracts relevant information.
+
+    Args:
+        config_text: The configuration script text.
+
+    Returns:
+        A dictionary containing the extracted information.
+    """
+
+    result = Queue()
+
+    for line in config_text.splitlines():
+        line = line.strip()
+
+        # Check for section headers
+        current_section = line[1:-1]
+
+        # Skip if no current section
+        if not current_section:
+            continue
+        _SPECIAL_INDICATOR = current_section.split(' ', 1)[0]
+        section = current_section[len(_SPECIAL_INDICATOR) + 1:]
+        line_kv = {}
+        line_kv[_SPECIAL_INDICATOR] = {}
+
+        Pairs = re.findall(r"(.+?)='(.+?)'", section)
+        if Pairs:
+            for pair in Pairs:
+                key, value = pair
+                line_kv[_SPECIAL_INDICATOR][key.lstrip()] = value.lstrip()
+        result.put(line_kv)
+
+    return result
 
 
 class TextEdit(QTextEdit):
@@ -57,7 +96,7 @@ class TextEdit(QTextEdit):
                                 background-color: rgb(80, 80, 80);
                             }
                             """)
-        self.setPlaceholderText("Send Message...")
+        self.setPlaceholderText("choose Agent...")
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -182,7 +221,7 @@ QScrollBar::sub-line,  QScrollBar::add-line {
         if MinimumLines < count <= MaximumLines:
             self.setFixedHeight(self.calculateFixedHeight(count))
         elif count > MaximumLines:
-            self.setFixedHeight(self.calculateFixedHeight(MaximumLines) )
+            self.setFixedHeight(self.calculateFixedHeight(MaximumLines))
             self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
 
     @pyqtSlot(str)
@@ -211,11 +250,19 @@ QScrollBar::sub-line,  QScrollBar::add-line {
         tc = self.textCursor()
         tc.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.MoveAnchor, len(self.c.completionPrefix()))
         tc.movePosition(QTextCursor.MoveOperation.EndOfWord, QTextCursor.MoveMode.KeepAnchor)
-        tc.insertText(self.bot.commands[completion])
+        tc.insertText(completion)
         self.setTextCursor(tc)
 
 
+class ExtendableInput:
+    Inputs: Queue = Queue()
+    def emptyQueue(self):
+        while not self.Inputs.empty():
+            self.Ex_Input.Inputs.get()
+
+
 class AutoResizableTextEdit(QWidget):
+    Ex_Input = ExtendableInput()
     KEY_V = "V"  # To start new Voice Record
     sendMessage = settings.value("send_message", "Ctrl+Return")  # to send the Message
     PromptButton = 'PromptButton'
@@ -227,6 +274,7 @@ class AutoResizableTextEdit(QWidget):
         editor_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.4)
         editor_font.setWeight(700)
         self.sender: Sender = sender
+        self.bot: Bot = bot
         if self.sendMessage == '':
             self.sendMessage = "Ctrl+Return"
         self.sender.connect_signal('isLoading_signal', self.LoadingState)
@@ -278,7 +326,7 @@ class AutoResizableTextEdit(QWidget):
         # Create recording thread and attach slots to its signals
         # TODO: Maybe i'll add voice messaging later it's just akward
         """
-        
+
         self.recording_thread = RecordingThread()
         self.recording_thread.sig_started.connect(self.recording_started)
         self.recording_thread.sig_stopped.connect(self.recording_stopped)
@@ -302,17 +350,95 @@ class AutoResizableTextEdit(QWidget):
 
         self.setLayout(layout)
 
+    def startSession(self, _scriptconfig: Dict) -> None:
+        self.bot.session.terminate_Process()
+        CMD: str = _scriptconfig.get('CMD')
+
+        if not CMD:
+            raise ValueError('No executable path is found')
+        self.bot.session.startNewProcess(CMD.split(' '))
+
     def sendData(self):
         text = self.text_Editor.toPlainText()
         if text:
-            self.sender.send_signal('input_signal', text)
+
+            agent = self.bot.commands.get(text)
+
+            if agent:
+                self.Ex_Input.emptyQueue()
+                config = parse_config(agent)
+
+                while not config.empty():
+                    item: Dict = config.get()
+
+                    if item.get('SCRIPT'):
+                        _script_config: Dict = item['SCRIPT']
+                        self.startSession(_script_config)
+                    if item.get('AGENT'):
+                        _profile_config: Dict = item['AGENT']
+                        self.sender.send_signal('input_signal',
+                                                _profile_config
+                                                )
+                    if item.get('INPUT'):
+                        _Input_config: Dict = item['INPUT']
+                        self.Ex_Input.Inputs.put(('INPUT', _Input_config))
+                    if item.get('CYCLE'):
+                        _Cycle_config: Dict = item['CYCLE']
+                        self.Ex_Input.Inputs.put(('CYCLE', _Cycle_config))
+
+
+
+
+
+
+                """"
+                [START]
+[SCRIPT PATH='C:\\Users\\haithem-yk\\Desktop\\Projects\\QuickGpt\\_scripts\\csv_script.py' INTERRUPTER_PATH='python' ]
+[AGENT NAME='BOB Accountant' PROFILE='C:\\Users\\haithem-yk\\Desktop\\csv\\Accountant.png']
+[INPUT TYPE='CSV FILE' SEPERATOR='\n']
+[CYCLE ENDSEQ='<END-SIGNAL>']
+[END]
+                """
+
+            if not self.Ex_Input.Inputs.empty():
+                _type, seq = self.Ex_Input.Inputs.get()
+                if _type == 'CYCLE':
+                    if text == seq.get('ENDSEQ'):
+                        self.sender.send_signal('input_signal',
+                                                {"type": "text",
+                                                 "content": text
+                                                 }
+                                                )
+                        if self.Ex_Input.Inputs.empty():
+                            self.text_Editor.setPlaceholderText('choose Agent...')
+                            self.text_Editor.clear()
+                            return
+                        else:
+                            self.sendData()
+                            return
+
+                    self.Ex_Input.Inputs.put((_type, seq))
+                    self.text_Editor.setPlaceholderText('send Message...')
+                    self.text_Editor.clear()
+
+                if _type == 'INPUT':
+                    Input = f'| {_type} |'
+                    for key in seq:
+                        Input += f' {key}:{seq[key]} |'
+                    self.text_Editor.setPlaceholderText(Input)
+                    self.text_Editor.clear()
+                    return
+
+            self.sender.send_signal('input_signal',
+                                    {"type": "text",
+                                     "content": text
+                                     }
+                                    )
+            # self.Ex_Input._Args.clear()
+
             self.text_Editor.clear()
-
     def stopStream(self):
-        self.bot.stop = True
         pass
-
-
     @pyqtSlot(tuple)
     def setShortcut(self, shortcut: tuple) -> None:
         seq, _type = shortcut
@@ -325,7 +451,6 @@ class AutoResizableTextEdit(QWidget):
     @pyqtSlot(bool)
     def LoadingState(self, is_loading: bool) -> None:
         self.send_button.setup_button('')
-
 
     @pyqtSlot()
     def recording_started(self):

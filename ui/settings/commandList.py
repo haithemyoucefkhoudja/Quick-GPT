@@ -8,10 +8,10 @@ from ui.settings.CommandEditor import CommandWrapper
 
 Config = Config()
 
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import QLineEdit,  QVBoxLayout
 
-from Config import Config
+from Config import _configInstance
 from ui.base_elements.CustomButton import CustomButton
 
 
@@ -29,6 +29,7 @@ class CommandList(QListWidget):
     def init_list(self):
         for item in self.bot.commands.keys():
             new_item = QListWidgetItem(item)
+            new_item.setIcon(QIcon(_configInstance.get_path('static_files/icons/file.png')))
             self.addItem(new_item)
 
 
@@ -48,7 +49,6 @@ class CommandWidget(QWidget):
         self.command_list.itemClicked.connect(self.edit_item)
 
         self.text_display = CommandWrapper(self, save_function=self.set_Command)
-
         # --- Main layout setup ---
         main_layout = QHBoxLayout()
 
@@ -88,7 +88,7 @@ QScrollBar::sub-line,  QScrollBar::add-line {
         self.commands_edit = QLineEdit()
         self.commands_edit.setFont(editor_font)
         self.commands_edit.setFixedHeight(42)
-        self.commands_edit.setPlaceholderText('add command..')
+        self.commands_edit.setPlaceholderText('add agent..')
 
         command_input_layout.addWidget(add_button)
         command_input_layout.addWidget(self.commands_edit)
@@ -98,6 +98,8 @@ QScrollBar::sub-line,  QScrollBar::add-line {
         text_scroll = QScrollArea()
         text_scroll.setWidget(self.text_display)
         text_scroll.setWidgetResizable(True)
+
+        self.text_display.setFixedWidth(int(text_scroll.width() * 0.85))
 
         text_scroll.setStyleSheet("""
                     background-color: rgb(57, 62, 70); 
@@ -154,6 +156,7 @@ QScrollBar::sub-line,  QScrollBar::add-line {
         if self.bot.commands.get(text):
             return
         new_item = QListWidgetItem(text)  # Create empty item
+        new_item.setIcon(QIcon(_configInstance.get_path('static_files/icons/file.png')))
         self.sender.send_signal('command_signal', text)
         self.command_list.addItem(new_item)
         self.commands_edit.clear()

@@ -1,148 +1,118 @@
 import json
 import os
-from typing import Dict
-from langchain_openai import ChatOpenAI
-import tiktoken
+import subprocess
+import tempfile
+from queue import Queue
+from typing import Dict, Optional
+
+import zmq
+from Communicator.zmqCommunicator import ZMQCommunicator
 from PyQt6.QtCore import pyqtBoundSignal
 from dotenv import load_dotenv
 from Config import _configInstance
+context = zmq.Context()
 
 
-class Bot:
+class Session(ZMQCommunicator):
+
     """"
     to yield the stream to the front-end
     """
+    process: Optional[subprocess.Popen] = None
+    Messages_Signals: Optional[Queue] = None
+    IsBusy: bool = False
+    output_file = Optional[tempfile.NamedTemporaryFile]
+    Script: list = []
+
+    def __init__(self):
+
+        super().__init__(socket_type=zmq.REQ)
+        self.connect("tcp://localhost:5555")
+        self.Messages_Signals = Queue()
+        # "C:\Users\haithem-yk\Desktop\New folder (4)\langchain-pdf-qa\src\pdf_qa.py"
+        # C:\\Users\\haithem-yk\\Desktop\\Projects\\QuickGpt\\_scripts\\simple.py
+        self.startNewProcess(['python', 'C:\\Users\\haithem-yk\\Desktop\\New folder (4)\\langchain-pdf-qa\\src\\pdf_qa.py'])
+
+    def terminate_Process(self):
+        if self.process:
+            self.terminateSession()
+            self.process.terminate()
+
+    def startNewProcess(self, cmd: list) -> None:
+        self.process = subprocess.Popen(cmd, stderr=subprocess.PIPE,text=True, close_fds=False)
+
+
+
+    def startSession(self):
+        self.IsBusy = True
+
+    def terminateSession(self):
+
+        self.IsBusy = False
+
+
+
+
+class Bot:
+    session = Session()
     """
     Config File
     """
     Config_file = _configInstance.get_path("Config.json")
     """
-    List Of engines
+    List Of Agents
     """
-    engines: list[Dict] = []
+    agents: list[Dict] = []
     """
-    Active Engine
+    Active Agent
     """
-    active_engine: Dict = {}
+    active_agent: Dict = {}
     """
     Dictonary of commands
     """
     commands: Dict = {}
-    """"
-    to stop the stream
-    """
-    stop: bool = False
 
-    temperature: float = 0.5
-    """ 
-    model_name: The name of the currently active large language model (LLM)
-    start: Token marking the beginning of the LLM's generated text Exp: "<|im_start|>" 
-    end: Token marking the end of the LLM's generated text Exp: "<|im_end|>"
-    """
-    active_model: Dict = {
-        "model_name": '',
-    }
-    """"
-    list of models
-    """
-    models: list[Dict] = []
-    """"
-    max request message size you can add tokenizer
-    """
-    max_request_tokens: int = 1000
-    """
-    max output length
-    """
-    max_response_tokens: int = 750
-    """
-    api_key 
-    """
-    api_key: str = ''
 
     def __init__(self):
         super().__init__()
         self.load_engine_parameters(None)
 
-    @staticmethod
-    def fill_template(template, **kwargs):
-        """
-        TODO: Maybe In the Future kind Hard
 
-        Fills a template string with positional arguments using string formatting.
 
-        Args:
-            template (str): The template string with placeholders.
-            **kwargs: Positional arguments to fill the placeholders.
+    """
+            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
 
-        Returns:
-            str: The formatted string with the placeholders filled in.
-        """
-        return template.format(**kwargs)
+                self.process = process
+                _index = 0
+                for line in iter(process.stdout.readline, b''):
+                    content = line.decode('utf-8')
+                    if content:
+                        self.session.Messages_Signals.put((content, _index))
+                        _index += 1
 
-    @staticmethod
-    def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
-        """Returns the number of tokens used by a list of messages."""
+                error = process.stderr.read().decode('utf-8')
+                if error:
+                    self.session.Messages_Signals.put((error, -1))
+                self.session.terminateSession()"""
+
+    def generate_response(self, Input: str, progress_callback: pyqtBoundSignal) -> str:
         try:
-            encoding = tiktoken.encoding_for_model(model)
-        except KeyError:
-            encoding = tiktoken.get_encoding("cl100k_base")
-        if model == "gpt-3.5-turbo-0613":  # note: future models may deviate from this
-            num_tokens = 0
-            for message in messages:
-                num_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
-                for key, value in message.items():
-                    num_tokens += len(encoding.encode(value))
-                    if key == "name":  # if there's a name, the role is omitted
-                        num_tokens += -1  # role is always required and always 1 token
-            num_tokens += 2  # every reply is primed with <im_start>assistant
-            return num_tokens
-        else:
-            raise NotImplementedError(f"""num_tokens_from_messages() is not presently implemented for model {model}.
-          See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.""")
-
-    def generate_response(self, template: str, progress_callback: pyqtBoundSignal) -> str:
-        try:
-            # input = self.fill_template(template, **kwargs)
-            result = ''
-
-            messages = [
-                {"role": "system", "content": "you are helpful assistant"},
-                {"role": "user", "content": template},
-            ]
-            tokens: int = self.num_tokens_from_messages(messages)
-            if tokens > self.max_request_tokens:
-                progress_callback.emit(f'\ntokens={tokens} > max_request_tokens={self.max_request_tokens}')
+            if self.session.IsBusy:
                 return ''
-            client: ChatOpenAI = ChatOpenAI(api_key=self.api_key,
-                                            base_url=self.active_engine.get('base_url'),
-                                            temperature=self.temperature,
-                                            model=self.active_model.get("model_name"),
-                                            max_tokens=self.max_response_tokens,
-                                            )
-            list_token = []
-            """with open(_configInstance.get_path('ui/Messanger/python exe.txt')) as file:
-                List = file.read()
-                my_list = ast.literal_eval(List)
-                print(len(my_list))"""
+            if not self.session.process:
+                return ''
 
+            self.session.startSession()
+
+            self.session.send_message(Input)
+            message = self.session.receive_message()
+            progress_callback.emit((message, 0))
             _index = 0
-            for chunk in client.stream(template):
-            #for content in my_list[2]:
-                content = chunk.content
-                """"
-                stream each token to the UI
-                """
-                list_token.append(content)
-                progress_callback.emit((content or "", _index))
-                result += content or ''
-                _index += 1
-            return result
-        except FileNotFoundError as e:
-            progress_callback.emit(('File Not Found Error:', -1))
-            print('File Not Found Error:', e.args)
+            self.session.terminateSession()
+
+            return 'hello'
         except Exception as e:
             progress_callback.emit((str(e), -1))
-            print('e:', str(e))
 
     def load_engine_parameters(self, name):
 
@@ -191,13 +161,9 @@ class Bot:
                 config_data = json.load(file)
             config_data['engines']['active_engine'] = self.active_engine.get('name')
             config_data['engines']['engines_data'][index] = {
-                "name": self.active_engine.get('name'),
-                "base_url": self.active_engine.get('base_url'),
-                "temperature": self.temperature,
-                "active_model": self.active_model,
-                "max_request_tokens": self.max_request_tokens,
-                "max_response_tokens": self.max_response_tokens,
-                "models": self.models,
+                "name": self.active_agent.get('name'),
+                "base_url": self.active_agent.get('base_url'),
+
             }
             with open(self.Config_file, "w") as file:
                 json.dump(config_data, file, indent=4)

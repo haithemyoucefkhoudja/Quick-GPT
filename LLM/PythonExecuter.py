@@ -13,7 +13,6 @@ class PythonExecutor(QThread):
         self.cmd = None
         self.PID = None
 
-
     def setCommand(self, cmd: list) -> None:
         self.cmd = cmd
 

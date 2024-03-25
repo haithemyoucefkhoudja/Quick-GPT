@@ -56,4 +56,7 @@ class Message:
 
     def setmessage(self, message: dict)-> None:
         self.content = message.get('content')
-        self.role = message.get('Role')
+        self.setRole(message.get('Role'))
+
+    def setRole(self, Role) -> None:
+        self.role = Role

@@ -1,10 +1,11 @@
 import re
-from typing import Optional
+from typing import Optional, Dict
 
+from IPython.external.qt_for_kernel import QtGui
 from PyQt6 import QtWidgets
 from PyQt6.Qsci import QsciScintilla
 from PyQt6.QtCore import Qt, pyqtSlot, QThread
-from PyQt6.QtGui import QFont, QColor, QPainter, QPixmap, QBitmap
+from PyQt6.QtGui import QFont, QColor, QPainter, QPixmap, QBitmap, QCursor
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel
 from LLM.PythonExecuter import  PythonExecutor
 from ui.Messanger.Message import Message, Role
@@ -23,7 +24,6 @@ class MessageEditor(BaseEditor):
         super().__init__(parent)
         self.init_GUI()
 
-
     def init_GUI(self) -> None:
         BaseEditor().init_GUI()
         self.setObjectName(self.OBJECT_NAME)
@@ -35,14 +35,13 @@ class MessageEditor(BaseEditor):
         self.setFont(self_font)
         self.document().documentLayout().documentSizeChanged.connect(self.resizeToFitContent)
         self.setFixedHeight(int(self.document().size().height()) + 10)
-        self.setCursor(Qt.CursorShape.IBeamCursor)
         self.setTextInteractionFlags(
         self.textInteractionFlags().NoTextInteraction)
         """self.setTextInteractionFlags(
             self.textInteractionFlags().TextSelectableByMouse |
             self.textInteractionFlags().TextBrowserInteraction |
             self.textInteractionFlags().TextSelectableByKeyboard)"""
-        self.font().setWeight(400)
+
 
     def resizeToFitContent(self) -> None:
         height = int(self.document().size().height()) + 10
@@ -56,7 +55,23 @@ class MessageEditor(BaseEditor):
             self.textInteractionFlags().TextSelectableByMouse |
             self.textInteractionFlags().TextBrowserInteraction |
             self.textInteractionFlags().TextSelectableByKeyboard)
-        self.setMarkdown(self.toPlainText())
+        pixmap = QPixmap(1, 1)
+        pixmap.fill(Qt.GlobalColor.transparent)  # Transparent pixmap
+        cursor = QCursor(pixmap)
+        self.setCursor(cursor)
+
+        self.cursorRect().setWidth(0)
+
+    def keyPressEvent(self, e: Optional[QtGui.QKeyEvent]) -> None:
+        if e.key() == Qt.Key.Key_Up or e.key() == Qt.Key.Key_Down:
+            self.parent().parent().keyPressEvent(e)
+        else:
+            # Call the base class implementation for other keys
+            super().keyPressEvent(e)
+
+    def focusInEvent(self, e: Optional[QtGui.QFocusEvent]) -> None:
+        pass
+
 
 
 class CodeEditor(QsciScintilla):
@@ -222,7 +237,7 @@ class MessageWrapper(QFrame, Message):
     BUTTON_SIZE: int = 32
     BUTTON_OBJECT_NAME: str = 'MessageButton'
     OBJECT_NAME: str = 'MessageWrapper'
-
+    AgentConfig: Optional[Dict] = None
     def __init__(self, parent=None, message=None, worker=None):
         super().__init__(parent, )
         self.text_editors: [Optional[MessageEditor, CodeWrapper]] = []
@@ -243,6 +258,7 @@ class MessageWrapper(QFrame, Message):
         self.speech_worker = None
 
         if message and message.get('content') == '':
+            self.setRole(message.get('Role'))
             self.init_GUI()
         if worker:
             self.worker: Worker = worker
@@ -289,6 +305,9 @@ class MessageWrapper(QFrame, Message):
         # Check if the sorted indices are equal to a range starting from the first index
         return indices == list(range(indices[0], indices[-1] + 1))
 
+    def remove_ansi_escape_codes(self, text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
 
     @pyqtSlot(tuple)
     def append_text(self, bot_token: tuple) -> None:
@@ -298,6 +317,8 @@ class MessageWrapper(QFrame, Message):
         pattern_found = True
         match = re.search(pattern, _bot_text)
 
+        """
+        need some editing
         if match:
             _fences = match.group()
             if _fences == '```':
@@ -329,8 +350,8 @@ class MessageWrapper(QFrame, Message):
                     editor_.insertPlainText(bot_text_right)
                     self.in_code_block = True
                 self.fences.clear()
-            return
-        editor_.insertPlainText(_bot_text)
+            return"""
+        editor_.insertPlainText(self.remove_ansi_escape_codes(_bot_text))
 
     def add_text_editor(self, Code=False) -> None:
         if Code:
@@ -362,15 +383,26 @@ class MessageWrapper(QFrame, Message):
         __label = RoundedImage()
         __label.setMaximumSize(32, 32)
         if self.role == Role.User:
-
             path = _configInstance.get_path('static_files/icons/user.png')
         else:
-            path = _configInstance.get_path('static_files/icons/bot.png')
+            path = self.AgentConfig.get('PROFILE') if self.AgentConfig else _configInstance.get_path(
+                'static_files/icons/bot.png')
+        self_font = QFont(_configInstance.Font, _configInstance.Flash_Card_Font_Size)
+        self_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.5)
+        self_font.setWeight(900)
+
+        _botlabel = QLabel(self.AgentConfig.get('NAME')) if self.AgentConfig else QLabel('Simple Bot')
+        _botlabel.setFont(self_font)
+        _botlabel.setStyleSheet("color: white; margin-left:5px;")
+
         __label.setImage(path)
 
         info_layout = QHBoxLayout()
         info_layout.addWidget(__label, alignment=Qt.AlignmentFlag.AlignLeft)
 
+        if self.role == Role.Bot:
+            info_layout.addWidget(_botlabel, alignment=Qt.AlignmentFlag.AlignLeft)
+            info_layout.addStretch()
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(self.Voice)
         buttons_layout.addStretch()

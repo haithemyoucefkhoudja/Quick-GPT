@@ -1,10 +1,8 @@
-import time
-
 from PyQt6.QtCore import Qt, pyqtSlot, QThreadPool
 from PyQt6.QtWidgets import QScrollArea, QVBoxLayout, QFrame, QSizePolicy
 from Config import _configInstance
 from LLM.bot import Bot
-from ui.Messanger._MessageUI import MessageWrapper, Message, CodeWrapper
+from ui.Messanger._MessageUI import MessageWrapper, Message
 from ui.Messanger.Message import Role
 from worker.worker import Worker
 
@@ -21,10 +19,8 @@ class Messanger(QScrollArea):
         self.setup_ui()
         self.sender = sender
         self.threadpool: QThreadPool = QThreadPool()
-
         if self.sender:
             self.sender.connect_signal('input_signal', self.add_Message)
-
 
 
     def setup_ui(self):
@@ -80,10 +76,15 @@ class Messanger(QScrollArea):
         for data in self.Flash_Cards_List[self.Index]:
             self.layout.addWidget(MessageWrapper(message={'content':data}))"""
 
-    @pyqtSlot(str)
-    def add_Message(self, data: str) -> None:
-        self.layout.addWidget(MessageWrapper(message={'content': data, 'Role': Role.User}))
-        worker = Worker(fn=self.addBotMessage, **{'template': data})
+    @pyqtSlot(dict)
+    def add_Message(self, Message: dict) -> None:
+        content = Message.get('content')
+        if Message.get('NAME') and Message.get('PROFILE'):
+            MessageWrapper.AgentConfig = Message
+        if not content:
+            return
+        self.layout.addWidget(MessageWrapper(message={'content': content, 'Role': Role.User}))
+        worker = Worker(fn=self.addBotMessage, **{'Input': content})
         botWrapper = MessageWrapper(message={'content': '', 'Role': Role.Bot}, worker=worker)
         self.layout.addWidget(botWrapper)
         self.setIsloading(True)

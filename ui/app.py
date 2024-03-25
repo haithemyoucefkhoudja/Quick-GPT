@@ -4,13 +4,14 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtWidgets import QVBoxLayout, QMainWindow, QWidget, QApplication, QHBoxLayout, QFrame, QLabel, \
     QSystemTrayIcon
-from Config import Config
+from Config import _configInstance
+from ui.AgentList.agentsList import ImageListWidget
 from ui.Messanger.Messanger import Messanger
 from ui.Menu.Menu import IconsMenu
 from ui.base_elements.CustomButton import CustomButton
 from ui.input.input import AutoResizableTextEdit
 
-Config = Config()
+
 
 
 class CustomTitleBar(QFrame):
@@ -25,10 +26,10 @@ class CustomTitleBar(QFrame):
         self.setAutoFillBackground(True)
         self.setObjectName(self.CUSTOM_TITLE_BAR)
         self.icon_path = "static_files/icons/QuickGPT.png"
-        self.setFixedSize(Config.Width, 32)
+        self.setFixedSize(_configInstance.Width, 32)
         layout = QHBoxLayout()
         title_label = QLabel()
-        picture = QPixmap(Config.get_path(self.icon_path))
+        picture = QPixmap(_configInstance.get_path(self.icon_path))
         title_label.setPixmap(picture)
         close_button = CustomButton(self.CLOSE_BUTTON_NAME, self.BUTTON_HEIGHT, self.BUTTON_WIDTH,
                                     buttons={
@@ -38,12 +39,12 @@ class CustomTitleBar(QFrame):
         close_button.setObjectName(self.CLOSE_BUTTON_NAME)
         close_button.setFixedHeight(self.BUTTON_HEIGHT)
         close_button.setFixedWidth(self.BUTTON_WIDTH)
-        close_button.setFont(QFont(Config.Font, 12))
+        close_button.setFont(QFont(_configInstance.Font, 12))
         close_button.setText('X')
         close_button.setShortcut(self.CLOSE_BUTTON_SHORTCUT)
         title_label = QLabel()
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        picture = QPixmap(Config.get_path(self.icon_path))
+        picture = QPixmap(_configInstance.get_path(self.icon_path))
         title_label.setPixmap(picture)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(title_label)
@@ -58,14 +59,16 @@ class MainWindow(QMainWindow):
     def __init__(self, bot, sender):
         super().__init__()
 
-        self.setFixedSize(Config.Width, Config.Height)
+        self.setFixedSize(_configInstance.Width, _configInstance.Height)
         self.center()
         main_layout = QVBoxLayout()
         # Connect the signal from Sender to the slot in Receiver
         message_container = Messanger(parent=self, sender=sender, bot=bot)
+        # AgentsList = ImageListWidget(parent=self, bot=bot)
         input = AutoResizableTextEdit(sender=sender, bot=bot)
         icons_menu = IconsMenu(bot=bot,sender=sender)
         main_layout.addWidget(icons_menu)
+        # main_layout.addWidget(AgentsList)
         main_layout.addWidget(message_container)
         main_layout.addWidget(input)
         central_widget = QWidget()
@@ -81,7 +84,7 @@ class MainWindow(QMainWindow):
         self.title_bar = CustomTitleBar(self, self.toggle_visibility)
         self.setMenuWidget(self.title_bar)
         main_layout.setSpacing(0)
-        self.setStyleSheet(Config.load_stylesheet(Config.get_path('static_files/style.css')))
+        self.setStyleSheet(_configInstance.load_stylesheet(_configInstance.get_path('static_files/style.css')))
         self.oldPos = self.pos()
 
     def center(self):

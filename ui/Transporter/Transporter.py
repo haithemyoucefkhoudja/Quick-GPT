@@ -5,7 +5,7 @@ from typing import Callable
 
 class Sender(QObject):
     command_signal = pyqtSignal(str)
-    input_signal = pyqtSignal(str)
+    input_signal = pyqtSignal(object)
     shortcut_signal = pyqtSignal(str)
     isLoading_signal = pyqtSignal(bool)
     set_shortcut_signal = pyqtSignal(tuple)

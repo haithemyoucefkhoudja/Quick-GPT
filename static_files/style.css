@@ -72,8 +72,33 @@ background-color: transparent;
 #scrollArea QScrollBar::sub-line, #scrollArea QScrollBar::add-line {
     background-color: rgb(57, 62, 70);
 }
+#AgentsScroll {
+border: none;
+}
+#AgentsScroll QScrollBar:vertical { width: 0px; }
+#AgentsScroll QScrollBar {
+    display: none;
+    background-color: transparent;
+    width: 10px;
+}
 
+#AgentsScroll QScrollBar::handle {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+    min-height: 20px;
+}
 
+#AgentsScroll QScrollBar::handle:hover {
+    background-color: rgb(120, 120, 120);
+}
+
+#AgentsScroll QScrollBar::sub-page, #AgentsScroll QScrollBar::add-page {
+    background-color: rgb(57, 62, 70);
+}
+
+#AgentsScroll QScrollBar::sub-line, #AgentsScroll QScrollBar::add-line {
+    background-color: rgb(57, 62, 70);
+}
 #MenuButton {
         background-color: rgb(57, 62, 70);
         width: 40px;
@@ -125,6 +150,31 @@ color: white;
 padding: 5px;
 border: None;
 background-color: rgb(57, 62, 70);
+}
+#AgentsList{
+border:None;
+background-color: rgb(57, 62, 70);
+}
+#AgentLabel{
+border:None;
+border-radius: 15px;
+padding: 2px 2px 2px 2px;
+}
+#agentButton {
+        background-color: rgb(57, 62, 70);
+        border: 1px solid white;
+        width: 20px;
+        height: 20px;
+        border-radius: 15px;
+        padding: 2px;
+}
+#agentButton:hover{
+        border: none;
+        background-color: rgb(144, 238, 144);
+}
+#AgentLabel:hover {
+border: 7px solid green;
+
 }
 
 #FileComboBox  {

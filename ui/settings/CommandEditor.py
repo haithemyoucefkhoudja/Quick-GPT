@@ -23,6 +23,7 @@ class CommandEditor(BaseEditor, Message):
 
     def init_GUI(self) -> None:
         BaseEditor().init_GUI()
+        self.setAcceptRichText(False)
         self.setObjectName(self.OBJECT_NAME)
         self.Allow_horizontalScroll(True)
         self.setReadOnly(True)
@@ -39,8 +40,10 @@ background-color: rgb(26, 28, 31);
         """)
         self_font = QFont(Config.Font, Config.Flash_Card_Font_Size)
         self_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 1)
+        self_font.setWeight(700)
         self.setFont(self_font)
         self.setCursor(Qt.CursorShape.IBeamCursor)
+        self.setLineWidth(55)
 
     @pyqtSlot(str)
     def append_text(self, bot_text) -> None:

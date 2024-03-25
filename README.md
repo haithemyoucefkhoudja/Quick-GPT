@@ -1,6 +1,6 @@
 # GUI for Large Language Models API
 
-This project is a graphical user interface (GUI) developed using PyQt6 for interacting with the Large Language Models API using Commands. The GUIto input text for processing by the API or Local LLM's.
+This project is a graphical user interface (GUI) developed using PyQt6 for interacting with the Large Language Models API using Commands. The GUI to input text for processing by the API or Local LLM's.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ Before running the GUI, make sure you have the following installed:
 3. Set up the Large Language Models API credentials:
 
    - Obtain an API key from the Large Language Models API provider.
-   - Create `.env` File
+   - Create `_scripts/.env` File
    - place the `API_KEY in .env` to start use it.
    
 ## Usage
@@ -34,14 +34,14 @@ Before running the GUI, make sure you have the following installed:
 To run the GUI, execute the following command:
 
 ```
-python main.py
+python Quick-GPT.py
 ```
 
 To create an executable app, you can run the following commands:
 
 ```
 pip install pyinstaller
-Pyinstaller --noconsole --add-data "Config.json;." --add-data "theme.json;." --add-data "static_files;static_files" --icon=window-icon.ico --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ex .\main.py
+Pyinstaller --noconsole --add-data "Config.json;." --add-data "theme.json;." --add-data "static_files;static_files" --add-data "_scripts;_scripts" --icon=window-icon.ico --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ex .\Quick-GPT.py
 ```
 The GUI window will open
 ## Python 3.10 Pyinstaller Compatibility Issue

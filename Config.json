@@ -271,14 +271,7 @@
         }
     },
     "commands": {
-        "translate": "Translate the given text into another language.",
-        "summarize": "Write a concise summary of the provided text.",
-        "generate_questions": "Generate questions based on the provided text.",
-        "paraphrase": "Paraphrase the given text to express the same meaning in different words.",
-        "spell_check": "Check the spelling of the given text and provide corrections.",
-        "explain": "explain the given text In simple way",
-        "generate_solutions": " generate solutions of the given Text and Questions",
-        "turn_to_code": " turn this text above to code ",
-        "web_scraping": "\"Create one  Python script! for the following:\n\nWeb Scraping using beautifulsoup4:\nContent to Extract: Clearly define the text content you want to target (e.g., news headlines, article bodies, product descriptions, etc.).\n\nText-to-Speech with gTTS:\nLanguage: The language for the speech output.\nSplitting Logic: Do you want to convert the entire scraped text into a single audio file, or create separate audio files for individual sections (like separate news headlines)?\ndirectory to save files \"C:\\Users\\haithem-yk\\Desktop\\audios\"\nTarget Website:\n\""
+        "RAG_Agent": "[START]\n[SCRIPT CMD='python C:\\Users\\haithem-yk\\Desktop\\New folder (4)\\langchain-pdf-qa\\src\\pdf_qa.py']\n[AGENT NAME='Samir Librarian' PROFILE='C:\\Users\\haithem-yk\\Desktop\\csv\\Accountant.png']\n[CYCLE END='<END-SIGNAL>']\n[END]",
+        "CSV_Agent": "[START]\n[SCRIPT CMD='python C:\\Users\\haithem-yk\\Desktop\\Projects\\QuickGpt\\_scripts\\csv_script.py']\n[AGENT NAME='BOB Accountant' PROFILE='C:\\Users\\haithem-yk\\Desktop\\csv\\Accountant.png']\n[INPUT TYPE='CSV FILE' SEPERATOR='\\n']\n[CYCLE ENDSEQ='<END-SIGNAL>']\n[INPUT TYPE='CSV FILE' SEPERATOR='\\n']\n[END]"
     }
 }
